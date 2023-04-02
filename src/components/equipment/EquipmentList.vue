@@ -31,9 +31,7 @@ export default {
     },
   },
   created() {
-    if (!this.equipmentList.length) {
-      this.$store.dispatch("fetchEquipmentList");
-    }
+    this.$store.dispatch("fetchEquipmentList");
   },
 }
 </script>
@@ -43,6 +41,8 @@ export default {
   max-width: 800px;
   margin: 0 auto;
   padding: 20px;
+  background-color: #f8f8f8;
+  border-radius: 5px;
 }
 
 .title {
@@ -50,6 +50,7 @@ export default {
   margin-bottom: 20px;
   text-align: center;
   color: #4a4a4a;
+  text-shadow: 1px 1px #eee;
 }
 
 .no-equipment {
@@ -62,7 +63,7 @@ export default {
 .create-button {
   font-size: 18px;
   padding: 10px;
-  background-color: #333;
+  background-color: #2f2f3e;
   color: white;
   border: none;
   border-radius: 5px;
@@ -72,5 +73,13 @@ export default {
   right: 20px;
   margin-top: 10px;
   margin-right: 10px;
+  box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s ease;
 }
+
+.create-button:hover {
+  background-color: #0097a7;
+}
+
+
 </style>

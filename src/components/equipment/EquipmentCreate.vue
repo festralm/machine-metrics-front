@@ -57,13 +57,13 @@ export default {
   data() {
     return {
       // photo: null,
-      inventoryNumber: "",
-      name: "",
+      inventoryNumber: null,
+      name: null,
       cost: null,
-      source: "",
-      department: "",
-      responsiblePerson: "",
-      status: "",
+      source: null,
+      department: null,
+      responsiblePerson: null,
+      status: null,
       receiptDate: null,
       lastOperationDate: null,
     };
@@ -78,12 +78,19 @@ export default {
         department: this.department,
         responsiblePerson: this.responsiblePerson,
         status: this.status,
-        receiptDate: new Date(this.receiptDate).toISOString(),
-        lastOperationDate: new Date(this.lastOperationDate).toISOString(),
+        receiptDate: this.receiptDate ? new Date(this.receiptDate).toISOString() : null,
+        lastOperationDate: this.lastOperationDate ? new Date(this.receiptDate).toISOString() : null,
       }
 
       try {
-        await equipmentStore.dispatch('saveEquipment', equipmentData)
+        const response = await equipmentStore.dispatch('saveEquipment', equipmentData)
+        const locationHeader = response.headers.get('location')
+
+        if (locationHeader) {
+          this.$router.push(locationHeader)
+        } else {
+          console.warn('Could not find Location header in response:', response)
+        }
 
         // Do something with the new equipment, e.g. show a success message, redirect to the equipment list, etc.
 
@@ -130,6 +137,20 @@ input {
   font-size: 16px;
   padding: 10px;
   border: none;
-  border-radius: 5px
+  border-radius: 5px;
+}
+
+.save-button {
+  background-color: #3f51b5;
+  color: white;
+  font-size: 18px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.save-button:hover {
+  background-color: #2c3e50;
 }
 </style>
