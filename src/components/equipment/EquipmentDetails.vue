@@ -1,81 +1,86 @@
 <template>
   <div class="equipment-detail" v-if="equipment">
-    <h1 class="title">{{ equipment.name }}</h1>
-    <div class="info-group">
-      <label for="inventory-number">Инвентарный номер:</label>
-      <span id="inventory-number">{{ equipment.inventoryNumber }}</span>
-    </div>
-    <div class="info-group">
-      <label for="cost">Стоимость:</label>
-      <span id="cost">{{ equipment.cost }}</span>
-    </div>
-    <div class="info-group">
-      <label for="source">Источник приобретения:</label>
-      <span id="source">{{ equipment.source }}</span>
-    </div>
-    <div class="info-group">
-      <label for="department">Подразделение:</label>
-      <span id="department">{{ equipment.department }}</span>
-    </div>
-    <div class="info-group">
-      <label for="responsible-person">Ответственное лицо:</label>
-      <span id="responsible-person">{{ equipment.responsiblePerson }}</span>
-    </div>
-    <div class="info-group">
-      <label for="status">Статус:</label>
-      <span id="status">{{ equipment.status }}</span>
-    </div>
-    <div class="info-group">
-      <label for="receipt-date">Дата поступления:</label>
-      <span id="receipt-date">{{ formatDate(equipment.receiptDate) }}</span>
-    </div>
-    <div class="info-group">
-      <label for="last-operation-date">Дата последней операции:</label>
-      <span id="last-operation-date">{{ formatDate(equipment.lastOperationDate) }}</span>
-    </div>
-    <div class="button-group">
-      <router-link class="edit-button" :to="{name: 'EquipmentEdit', params: {id: equipment.id}}">Редактировать
-      </router-link>
-      <button class="delete-button" @click="deleteEquipment">Удалить</button>
-    </div>
+      <h1 class="title">{{ equipment.name }}</h1>
+      <div class="info-group">
+          <label for="inventory-number">Инвентарный номер:</label>
+          <span id="inventory-number">{{ equipment.inventoryNumber }}</span>
+      </div>
+      <div class="info-group">
+          <label for="cost">Стоимость:</label>
+          <span id="cost">{{ equipment.cost }}</span>
+      </div>
+      <div class="info-group">
+          <label for="source">Источник приобретения:</label>
+          <span id="source">{{ equipment.source }}</span>
+      </div>
+      <div class="info-group">
+          <label for="department">Подразделение:</label>
+          <span id="department">{{ equipment.department }}</span>
+      </div>
+      <div class="info-group">
+          <label for="responsible-person">Ответственное лицо:</label>
+          <span id="responsible-person">{{ equipment.responsiblePerson }}</span>
+      </div>
+      <div class="info-group">
+          <label for="status">Статус:</label>
+          <span id="status">{{ equipment.status }}</span>
+      </div>
+      <div class="info-group">
+          <label for="receipt-date">Дата поступления:</label>
+          <span id="receipt-date">{{ formatDate(equipment.receiptDate) }}</span>
+      </div>
+      <div class="info-group">
+          <label for="last-operation-date">Дата последней операции:</label>
+          <span id="last-operation-date">{{ formatDate(equipment.lastOperationDate) }}</span>
+      </div>
+      <div>
+          <EquipmentDataChart v-if="equipment" :equipmentId="equipment.id"/>
+      </div>
+      <div class="button-group">
+          <router-link class="edit-button" :to="{name: 'EquipmentEdit', params: {id: equipment.id}}">Редактировать
+          </router-link>
+          <button class="delete-button" @click="deleteEquipment">Удалить</button>
+      </div>
   </div>
 </template>
 
 <script>
 import equipmentStore from '@/store/equipment.js'
+import EquipmentDataChart from '@/components/chart/EquipmentDataChart.vue'
 
 export default {
-  name: "EquipmentDetails",
-  data() {
-    return {}
-  },
-  computed: {
-    equipment() {
-      return equipmentStore.state.currentEquipment
-    }
-  },
-  async created() {
-    const equipmentId = this.$route.params.id
-    await equipmentStore.dispatch('fetchEquipmentById', equipmentId)
-  },
-  methods: {
-    formatDate(dateString) {
-      if (!dateString) return ''
-      const date = new Date(dateString)
-      const day = date.getDate().toString().padStart(2, '0')
-      const month = (date.getMonth() + 1).toString().padStart(2, '0')
-      const year = date.getFullYear()
-      return `${day}.${month}.${year}`
+    name: "EquipmentDetails",
+    components: {EquipmentDataChart},
+    data() {
+        return {}
     },
-    async deleteEquipment() {
-      try {
-        await equipmentStore.dispatch('deleteEquipment', this.equipment.id);
-        this.$router.push({name: 'EquipmentList'});
-      } catch (error) {
-        console.error(error);
-      }
+    computed: {
+        equipment() {
+            return equipmentStore.state.currentEquipment
+        }
     },
-  },
+    async created() {
+        const equipmentId = this.$route.params.id
+        await equipmentStore.dispatch('fetchEquipmentById', equipmentId)
+    },
+    methods: {
+        formatDate(dateString) {
+            if (!dateString) return ''
+            const date = new Date(dateString)
+            const day = date.getDate().toString().padStart(2, '0')
+            const month = (date.getMonth() + 1).toString().padStart(2, '0')
+            const year = date.getFullYear()
+            return `${day}.${month}.${year}`
+        },
+        async deleteEquipment() {
+            try {
+                await equipmentStore.dispatch('deleteEquipment', this.equipment.id);
+                this.$router.push({name: 'EquipmentList'});
+            } catch (error) {
+                console.error(error);
+            }
+        },
+    },
 }
 </script>
 
