@@ -4,9 +4,12 @@
       <img src="/logo.png" alt="Main Logo" class="logo">
     </router-link>
     <ul class="menu-items">
-      <li>
-        <router-link :to="{ name: 'EquipmentList' }">Оборудование</router-link>
-      </li>
+        <li>
+            <router-link :to="{ name: 'EquipmentList' }">Оборудование</router-link>
+        </li>
+        <li>
+            <router-link :to="{ name: 'ServiceList' }">Список сервисов</router-link>
+        </li>
     </ul>
   </div>
 </template>

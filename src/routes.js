@@ -3,6 +3,7 @@ import EquipmentList from "./components/equipment/EquipmentList.vue";
 import EquipmentCreate from "./components/equipment/EquipmentCreate.vue";
 import EquipmentDetails from "./components/equipment/EquipmentDetails.vue";
 import EquipmentEdit from "./components/equipment/EquipmentEdit.vue";
+import ServiceList from "./components/data-service/ServiceList.vue";
 
 const routes = [
     {
@@ -14,6 +15,11 @@ const routes = [
         path: "/",
         name: "EquipmentList",
         component: EquipmentList,
+    },
+    {
+        path: "/data-service",
+        name: "ServiceList",
+        component: ServiceList,
     },
     {
         path: "/create",
