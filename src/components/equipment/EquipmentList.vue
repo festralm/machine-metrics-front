@@ -1,7 +1,7 @@
 <template>
   <div class="equipment-list">
     <h1 class="title">Оборудование</h1>
-    <div v-if="equipmentList.length > 0">
+    <div v-if="equipmentList && equipmentList.length > 0">
       <div v-for="equipment in equipmentList" :key="equipment.id">
         <equipment-item :equipment="equipment"/>
       </div>

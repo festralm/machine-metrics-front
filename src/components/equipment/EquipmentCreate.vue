@@ -91,9 +91,6 @@ export default {
         } else {
           console.warn('Could not find Location header in response:', response)
         }
-
-        // Do something with the new equipment, e.g. show a success message, redirect to the equipment list, etc.
-
       } catch (error) {
         console.error(error)
       }

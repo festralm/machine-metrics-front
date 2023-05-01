@@ -34,7 +34,7 @@
           <span id="last-operation-date">{{ formatDate(equipment.lastOperationDate) }}</span>
       </div>
       <div>
-          <EquipmentDataChart v-if="equipment" :equipmentId="equipment.id"/>
+          <EquipmentDataChart v-if="equipment" :equipmentId="$route.params.id"/>
       </div>
       <div class="button-group">
           <router-link class="edit-button" :to="{name: 'EquipmentEdit', params: {id: equipment.id}}">Редактировать
