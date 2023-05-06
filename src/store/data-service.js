@@ -1,5 +1,6 @@
 import Vuex from 'vuex'
 
+const API_URL = process.env.VUE_APP_API_URL
 const dataService = new Vuex.Store({
     state: {
         serviceList: [],
@@ -14,14 +15,13 @@ const dataService = new Vuex.Store({
     },
     actions: {
         async fetchServiceList({commit}) {
-            // todo url
-            const response = await fetch(`http://localhost:8083/api/v1/data-service`)
+            const response = await fetch(`${API_URL}/data-service`)
             const serviceList = await response.json()
             commit('setServiceList', serviceList)
         },
         async deleteService({commit}, serviceId) {
             try {
-                const response = await fetch(`http://localhost:8083/api/v1/data-service/${serviceId}`, {
+                const response = await fetch(`${API_URL}/data-service/${serviceId}`, {
                     method: 'DELETE'
                 })
 
@@ -36,7 +36,7 @@ const dataService = new Vuex.Store({
             try {
                 let response
                 let savedService
-                response = await fetch(`http://localhost:8083/api/v1/data-service`, {
+                response = await fetch(`${API_URL}/data-service`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'

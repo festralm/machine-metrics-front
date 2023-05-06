@@ -38,8 +38,7 @@ const equipment = new Vuex.Store({
         },
         async fetchEquipmentStatistics({commit}, data) {
             try {
-                // todo url
-                let url = `http://localhost:8087/api/v1/equipment-data`;
+                let url = `${API_URL}/equipment-data`;
                 if (data.id) {
                     url += `?id=${data.id}`;
                 }
