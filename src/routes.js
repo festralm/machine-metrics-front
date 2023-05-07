@@ -5,6 +5,10 @@ import EquipmentDetails from "./components/equipment/EquipmentDetails.vue";
 import EquipmentEdit from "./components/equipment/EquipmentEdit.vue";
 import ServiceList from "./components/data-service/ServiceList.vue";
 import CronExpressionList from "@/components/cron-expression/CronExpressionList.vue";
+import UserList from "@/components/user/UserList.vue";
+import UserCreate from "@/components/user/UserCreate.vue";
+import UserDetails from "./components/user/UserDetails.vue";
+import UserEdit from "./components/user/UserEdit.vue";
 
 const routes = [
     {
@@ -41,6 +45,26 @@ const routes = [
         path: "/equipment/:id",
         name: "EquipmentDetails",
         component: EquipmentDetails,
+    },
+    {
+        path: "/user",
+        name: "UserList",
+        component: UserList,
+    },
+    {
+        path: "/user/create",
+        name: "UserCreate",
+        component: UserCreate,
+    },
+    {
+        path: "/user/edit/:id",
+        name: "UserEdit",
+        component: UserEdit,
+    },
+    {
+        path: "/user/:id",
+        name: "UserDetails",
+        component: UserDetails,
     },
 ];
 
