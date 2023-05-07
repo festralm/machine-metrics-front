@@ -7,12 +7,12 @@
         <span>{{ equipment.inventoryNumber }}</span>
       </div>
     </div>
-    <button @click.stop="deleteEquipment">Удалить</button>
+    <button @click.stop="deleteEquipment(equipment.id)">Удалить</button>
   </div>
 </template>
 
 <script>
-import equipmentStore from '@/store/equipment.js'
+import {mapActions} from 'vuex'
 
 export default {
   name: "EquipmentItem",
@@ -23,16 +23,10 @@ export default {
     },
   },
   methods: {
-    goToDetails() {
-      this.$router.push({name: 'EquipmentDetails', params: {id: this.equipment.id}})
-    },
-    async deleteEquipment() {
-      try {
-        await equipmentStore.dispatch('deleteEquipment', this.equipment.id);
-      } catch (error) {
-        console.error(error);
-      }
-    },
+      ...mapActions('equipment', ['deleteEquipment']),
+      goToDetails() {
+          this.$router.push({name: 'EquipmentDetails', params: {id: this.equipment.id}})
+      },
   },
 }
 </script>

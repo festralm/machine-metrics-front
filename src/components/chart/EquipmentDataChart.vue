@@ -20,7 +20,7 @@
 <script>
 import {CategoryScale, Chart as ChartJS, Legend, LinearScale, LineElement, PointElement, Title, Tooltip} from 'chart.js'
 import {Line} from 'vue-chartjs'
-import equipmentStore from '@/store/equipment.js'
+import {mapActions, mapGetters} from 'vuex'
 
 
 ChartJS.register(
@@ -38,7 +38,7 @@ export default {
     components: {Line},
     props: {
         equipmentId: {
-            type: Number,
+            type: String,
             required: true
         }
     },
@@ -52,7 +52,7 @@ export default {
     },
     computed: {
         equipmentStatistics() {
-            return equipmentStore.state.currentEquipmentStatistics
+            return this.getCurrentEquipmentStatistics()
         },
     },
     async created() {
@@ -90,6 +90,8 @@ export default {
         this.endPeriod = new Date(this.equipmentStatistics.end)
     },
     methods: {
+        ...mapGetters('equipmentStatistics', ['getCurrentEquipmentStatistics']),
+        ...mapActions('equipmentStatistics', ['fetchEquipmentStatistics']),
         async saveStartDate(value) {
             this.startPeriod = new Date(value);
             await this.fetchStatistics()
@@ -99,8 +101,7 @@ export default {
             await this.fetchStatistics()
         },
         async fetchStatistics() {
-            await equipmentStore.dispatch(
-                'fetchEquipmentStatistics',
+            await this.fetchEquipmentStatistics(
                 {
                     id: this.equipmentId,
                     start: this.startPeriod ? this.startPeriod.toISOString() : null,

@@ -47,7 +47,7 @@
 
 <script>
 
-import equipmentStore from "@/store/equipment";
+import {mapActions, mapGetters} from 'vuex'
 
 export default {
   name: "EquipmentEdit",
@@ -68,25 +68,27 @@ export default {
     }
   },
   created() {
-    const equipmentId = this.$route.params.id;
-    equipmentStore.dispatch('fetchEquipmentById', equipmentId);
+      const equipmentId = this.$route.params.id;
+      this.fetchEquipmentById(equipmentId);
   },
   methods: {
-    updateEquipment() {
-      this.formData.receiptDate = this.formData.receiptDate ? new Date(this.formData.receiptDate).toISOString() : null;
-      this.formData.lastOperationDate = this.formData.lastOperationDate ? new Date(this.formData.lastOperationDate).toISOString() : null;
-      this.$store.dispatch('saveEquipment', this.formData)
-          .then((response) => {
-            this.$router.push({name: 'EquipmentDetails', params: {id: response.updatedEquipment.id}})
-          })
-          .catch((error) => {
-            console.error(error)
-          })
-    },
+      ...mapActions('equipment', ['saveEquipment', 'fetchEquipmentById']),
+      ...mapGetters('equipment', ['getCurrentEquipment']),
+      updateEquipment() {
+          this.formData.receiptDate = this.formData.receiptDate ? new Date(this.formData.receiptDate).toISOString() : null;
+          this.formData.lastOperationDate = this.formData.lastOperationDate ? new Date(this.formData.lastOperationDate).toISOString() : null;
+          this.saveEquipment(this.formData)
+              .then((response) => {
+                  this.$router.push({name: 'EquipmentDetails', params: {id: response.updatedEquipment.id}})
+              })
+              .catch((error) => {
+                  console.error(error)
+              })
+      },
   },
   computed: {
     currentEquipment() {
-      return this.$store.state.currentEquipment || {}
+        return this.getCurrentEquipment() || {}
     },
   },
   watch: {

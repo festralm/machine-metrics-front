@@ -4,6 +4,7 @@ import EquipmentCreate from "./components/equipment/EquipmentCreate.vue";
 import EquipmentDetails from "./components/equipment/EquipmentDetails.vue";
 import EquipmentEdit from "./components/equipment/EquipmentEdit.vue";
 import ServiceList from "./components/data-service/ServiceList.vue";
+import CronExpressionList from "@/components/cron-expression/CronExpressionList.vue";
 
 const routes = [
     {
@@ -20,6 +21,11 @@ const routes = [
         path: "/data-service",
         name: "ServiceList",
         component: ServiceList,
+    },
+    {
+        path: "/cron",
+        name: "CronExpressionList",
+        component: CronExpressionList,
     },
     {
         path: "/create",

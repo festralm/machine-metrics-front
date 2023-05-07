@@ -33,37 +33,67 @@
           <label for="last-operation-date">Дата последней операции:</label>
           <span id="last-operation-date">{{ formatDate(equipment.lastOperationDate) }}</span>
       </div>
+      <div class="equipment-schedule" v-if="equipmentSchedule">
+          <div class="info-group">
+              <label for="enabled">Включено:</label>
+              <span id="enabled">{{ equipmentSchedule.enabled ? "Да" : "Нет" }}</span>
+          </div>
+          <div class="info-group">
+              <label for="data-service">Сервис данных:</label>
+              <span
+                  id="data-service">{{ equipmentSchedule.dataService ? equipmentSchedule.dataService.name : "" }}</span>
+          </div>
+          <div class="info-group">
+              <label for="cron-expression">Выражение Cron:</label>
+              <span id="cron-expression">{{ equipmentSchedule.cron ? equipmentSchedule.cron.name : "" }}</span>
+          </div>
+          <button @click="showOrCloseModal(true)">Изменить</button>
+          <EquipmentScheduleCreateModal v-if="showModal" :equipmentSchedule="equipmentSchedule"
+                                        @close="showOrCloseModal(false)"
+                                        @save="createEquipmentSchedule"></EquipmentScheduleCreateModal>
+      </div>
       <div>
           <EquipmentDataChart v-if="equipment" :equipmentId="$route.params.id"/>
       </div>
       <div class="button-group">
           <router-link class="edit-button" :to="{name: 'EquipmentEdit', params: {id: equipment.id}}">Редактировать
           </router-link>
-          <button class="delete-button" @click="deleteEquipment">Удалить</button>
+          <button class="delete-button" @click="deleteCurrentEquipment()">Удалить</button>
       </div>
   </div>
 </template>
 
 <script>
-import equipmentStore from '@/store/equipment.js'
 import EquipmentDataChart from '@/components/chart/EquipmentDataChart.vue'
+import EquipmentScheduleCreateModal from "@/components/equipment/EquipmentScheduleCreateModal.vue";
+import {mapActions, mapGetters} from 'vuex'
 
 export default {
     name: "EquipmentDetails",
-    components: {EquipmentDataChart},
+    components: {EquipmentScheduleCreateModal, EquipmentDataChart},
     data() {
-        return {}
+        return {
+            showModal: false,
+        }
     },
     computed: {
         equipment() {
-            return equipmentStore.state.currentEquipment
+            return this.getCurrentEquipment()
+        },
+        equipmentSchedule() {
+            return this.getCurrentEquipmentSchedule()
         }
     },
     async created() {
         const equipmentId = this.$route.params.id
-        await equipmentStore.dispatch('fetchEquipmentById', equipmentId)
+        await this.fetchEquipmentById(equipmentId)
+        await this.fetchEquipmentScheduleById(equipmentId)
     },
     methods: {
+        ...mapActions('equipment', ['fetchEquipmentById', 'deleteEquipment']),
+        ...mapGetters('equipment', ['getCurrentEquipment']),
+        ...mapActions('equipmentSchedule', ['fetchEquipmentScheduleById', 'saveEquipmentSchedule']),
+        ...mapGetters('equipmentSchedule', ['getCurrentEquipmentSchedule']),
         formatDate(dateString) {
             if (!dateString) return ''
             const date = new Date(dateString)
@@ -72,13 +102,32 @@ export default {
             const year = date.getFullYear()
             return `${day}.${month}.${year}`
         },
-        async deleteEquipment() {
-            try {
-                await equipmentStore.dispatch('deleteEquipment', this.equipment.id);
-                this.$router.push({name: 'EquipmentList'});
-            } catch (error) {
-                console.error(error);
+        async deleteCurrentEquipment() {
+            await this.deleteEquipment(this.equipment.id);
+            this.$router.push({name: 'EquipmentList'});
+        },
+        async createEquipmentSchedule(equipmentSchedule) {
+            equipmentSchedule.id = this.$route.params.id
+            if (!equipmentSchedule.dataServiceId) {
+                equipmentSchedule.dataServiceId = null
             }
+            if (!equipmentSchedule.cronId) {
+                equipmentSchedule.cronId = null
+            }
+            const response = await this.saveEquipmentSchedule(equipmentSchedule)
+            if (response.ok) {
+                this.showOrCloseModal(false)
+                const locationHeader = response.headers.get('location')
+
+                if (locationHeader) {
+                    this.$router.push(locationHeader)
+                } else {
+                    console.warn('Could not find Location header in response:', response)
+                }
+            }
+        },
+        showOrCloseModal(show) {
+            this.showModal = show
         },
     },
 }

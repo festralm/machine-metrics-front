@@ -1,7 +1,8 @@
-import Vuex from 'vuex'
+import {fetchWithResponseCheck} from '../utils';
 
 const API_URL = process.env.VUE_APP_API_URL
-const dataService = new Vuex.Store({
+const dataService = {
+    namespaced: true,
     state: {
         serviceList: [],
     },
@@ -15,13 +16,17 @@ const dataService = new Vuex.Store({
     },
     actions: {
         async fetchServiceList({commit}) {
-            const response = await fetch(`${API_URL}/data-service`)
-            const serviceList = await response.json()
-            commit('setServiceList', serviceList)
+            try {
+                const response = await fetchWithResponseCheck(`${API_URL}/data-service`)
+                const serviceList = await response.json()
+                commit('setServiceList', serviceList)
+            } catch (error) {
+                console.log(error)
+            }
         },
         async deleteService({commit}, serviceId) {
             try {
-                const response = await fetch(`${API_URL}/data-service/${serviceId}`, {
+                const response = await fetchWithResponseCheck(`${API_URL}/data-service/${serviceId}`, {
                     method: 'DELETE'
                 })
 
@@ -36,7 +41,7 @@ const dataService = new Vuex.Store({
             try {
                 let response
                 let savedService
-                response = await fetch(`${API_URL}/data-service`, {
+                response = await fetchWithResponseCheck(`${API_URL}/data-service`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -48,15 +53,16 @@ const dataService = new Vuex.Store({
 
                 commit('setServiceList', [...state.serviceList, savedService])
 
-                return {savedService, headers: response.headers}
+                return {ok: true, savedService, headers: response.headers}
             } catch (error) {
                 console.error(error)
+                return {ok: false}
             }
         },
     },
     getters: {
         getServiceList: state => state.serviceList,
     }
-})
+}
 
 export default dataService
