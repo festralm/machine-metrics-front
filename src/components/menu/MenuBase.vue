@@ -8,6 +8,9 @@
             <router-link :to="{ name: 'EquipmentList' }">Оборудование</router-link>
         </li>
         <li>
+            <router-link :to="{ name: 'UserList' }">Пользователи</router-link>
+        </li>
+        <li>
             <router-link :to="{ name: 'ServiceList' }">Список сервисов</router-link>
         </li>
         <li>
