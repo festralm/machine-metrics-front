@@ -16,15 +16,15 @@ const equipmentSchedule = {
             try {
                 const response = await fetchWithResponseCheck(`${API_URL}/equipment-info/${id}`)
                 var equipmentSchedule
-                if (response.status === 404) {
+                    equipmentSchedule = await response.json()
+            } catch (error) {
+                if (error.status === 404) {
                     equipmentSchedule = {enabled: false}
                 } else {
-                    equipmentSchedule = await response.json()
+                    console.error(error);
                 }
-                commit('setCurrentEquipmentSchedule', equipmentSchedule);
-            } catch (error) {
-                console.error(error);
             }
+            commit('setCurrentEquipmentSchedule', equipmentSchedule);
         },
         async saveEquipmentSchedule({commit}, equipmentSchedule) {
             try {

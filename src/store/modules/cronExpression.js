@@ -13,6 +13,13 @@ const cronExpression = {
         removeCronFromList(state, cronId) {
             state.cronList = state.cronList.filter(cron => cron.id !== cronId)
         },
+        replaceCronInList(state, data) {
+            const index = state.cronList.findIndex(item => item.id === data.id);
+
+            if (index !== -1) {
+                state.cronList.splice(index, 1, data.cron);
+            }
+        },
     },
     actions: {
         async fetchCronExpressionsList({commit}) {
@@ -42,21 +49,33 @@ const cronExpression = {
             try {
                 let response
                 let savedCron
-                response = await fetchWithResponseCheck(`${API_URL}/cron`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(cronData)
-                })
+                let cronId = cronData.id;
+                if (cronId) {
+                    response = await fetchWithResponseCheck(`${API_URL}/cron/${cronId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(cronData)
+                    })
+                    savedCron = await response.json()
+                    commit('replaceCronInList', {id: cronId, cron: savedCron})
+                } else {
+                    response = await fetchWithResponseCheck(`${API_URL}/cron`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(cronData)
+                    })
+                    savedCron = await response.json()
+                    commit('setCronList', [...state.cronList, savedCron])
+                }
 
-                savedCron = await response.json()
-
-                commit('setCronList', [...state.cronList, savedCron])
-
-                return {savedCron: savedCron, headers: response.headers}
+                return {ok: true, savedCron: savedCron, headers: response.headers}
             } catch (error) {
                 console.error(error)
+                return {ok: false}
             }
         },
     },

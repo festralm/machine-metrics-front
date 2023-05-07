@@ -1,11 +1,21 @@
 <template>
     <div class="modal">
         <div class="modal-content">
-            <h2>Добавить оборудование</h2>
-            <label for="name">Название:</label>
-            <input type="text" v-model="name" id="name">
+            <h2>Добавить cron-выражение</h2>
+            <div>
+                <label for="name">Выражение:</label>
+                <input type="text" v-model="cron.expression" id="expression">
+            </div>
+            <div>
+                <label for="name">Порядок:</label>
+                <input type="text" v-model="cron.order" id="order">
+            </div>
+            <div>
+                <label for="name">Название:</label>
+                <input type="text" v-model="cron.name" id="name">
+            </div>
             <div class="modal-buttons">
-                <button @click="saveService">Сохранить</button>
+                <button @click="saveCron">Сохранить</button>
                 <button @click="$emit('close')">Отмена</button>
             </div>
         </div>
@@ -15,15 +25,41 @@
 <script>
 export default {
     name: "CronExpressionCreateModal",
+    props: {
+        editingCron: {
+            type: Object,
+            required: true,
+        },
+    },
     data() {
         return {
-            name: '',
+            cron: {
+                expression: '',
+                order: null,
+                name: '',
+            },
+        }
+    },
+    created() {
+        if (this.editingCron) {
+            this.cron = {
+                id: this.editingCron.id,
+                expression: this.editingCron.expression,
+                order: this.editingCron.order,
+                name: this.editingCron.name,
+            };
+        } else {
+            this.cron = {
+                id: null,
+                expression: '',
+                order: null,
+                name: '',
+            };
         }
     },
     methods: {
-        saveService() {
-            this.$emit('save', this.name);
-            this.name = '';
+        saveCron() {
+            this.$emit('save', this.cron);
         },
     },
 }

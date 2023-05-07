@@ -17,6 +17,13 @@ const equipment = {
         removeEquipmentFromList(state, equipmentId) {
             state.equipmentList = state.equipmentList.filter(equipment => equipment.id !== equipmentId)
         },
+        replaceEquipmentInList(state, data) {
+            const index = state.equipmentList.findIndex(item => item.id === data.id);
+
+            if (index !== -1) {
+                state.equipmentList.splice(index, 1, data.equipment);
+            }
+        },
     },
     actions: {
         async fetchEquipmentList({commit}) {
@@ -42,16 +49,17 @@ const equipment = {
                 let response
                 let updatedEquipment
 
-                if (equipmentData.id) {
-                    response = await fetchWithResponseCheck(`${API_URL}/equipment/${equipmentData.id}`, {
+                let equipmentId = equipmentData.id;
+                if (equipmentId) {
+                    response = await fetchWithResponseCheck(`${API_URL}/equipment/${equipmentId}`, {
                         method: 'PUT',
                         headers: {
                             'Content-Type': 'application/json'
                         },
                         body: JSON.stringify(equipmentData)
                     })
-
                     updatedEquipment = await response.json()
+                    commit('replaceEquipmentInList', {id: equipmentId, equipment: updatedEquipment})
                 } else {
                     response = await fetchWithResponseCheck(`${API_URL}/equipment`, {
                         method: 'POST',
@@ -60,11 +68,10 @@ const equipment = {
                         },
                         body: JSON.stringify(equipmentData)
                     })
-
                     updatedEquipment = await response.json()
-
                     commit('setEquipmentList', [...state.equipmentList, updatedEquipment])
                 }
+
                 commit('setCurrentEquipment', updatedEquipment);
 
                 return {ok: true, updatedEquipment, headers: response.headers}

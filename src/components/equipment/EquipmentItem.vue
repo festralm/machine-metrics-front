@@ -7,7 +7,7 @@
         <span>{{ equipment.inventoryNumber }}</span>
       </div>
     </div>
-    <button @click.stop="deleteEquipment">Удалить</button>
+    <button @click.stop="deleteEquipment(equipment.id)">Удалить</button>
   </div>
 </template>
 

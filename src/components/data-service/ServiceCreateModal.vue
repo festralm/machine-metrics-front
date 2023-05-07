@@ -1,7 +1,7 @@
 <template>
     <div class="modal">
         <div class="modal-content">
-            <h2>Добавить оборудование</h2>
+            <h2>Добавить сервис</h2>
             <label for="name">Название:</label>
             <input type="text" v-model="name" id="name">
             <div class="modal-buttons">

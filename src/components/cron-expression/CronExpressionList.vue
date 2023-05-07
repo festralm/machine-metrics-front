@@ -10,12 +10,13 @@
                     </div>
                     <div class="info-group">
                         <label for="cron">Cron:</label>
-                        <span id="cron">{{ cron.id }}</span>
+                        <span id="cron">{{ cron.expression }}</span>
                     </div>
                     <div class="info-group">
                         <label for="order">Порядок:</label>
                         <span id="order">{{ cron.order }}</span>
                     </div>
+                    <button @click="showOrCloseModal(true, cron.id)">Редактировать</button>
                     <button @click="deleteCronExpression(cron.id)">Удалить</button>
                 </li>
             </div>
@@ -24,7 +25,7 @@
             </div>
         </ul>
         <button @click="showOrCloseModal(true)">Добавить cron-выражение</button>
-        <CronExpressionCreateModal v-if="showModal" @close="showOrCloseModal(false)"
+        <CronExpressionCreateModal v-if="showModal" :editingCron="editingCron" @close="showOrCloseModal(false)"
                                    @save="createCron"></CronExpressionCreateModal>
     </div>
 </template>
@@ -41,6 +42,7 @@ export default {
     data() {
         return {
             showModal: false,
+            editingCron: null,
         }
     },
     computed: {
@@ -54,10 +56,7 @@ export default {
     methods: {
         ...mapActions('cronExpression', ['fetchCronExpressionsList', 'deleteCronExpression', 'saveCronExpression']),
         ...mapGetters('cronExpression', ['getCronList']),
-        async createCron(name) {
-            const cronData = {
-                name: name,
-            }
+        async createCron(cronData) {
             const response = await this.saveCronExpression(cronData)
             if (response.ok) {
                 this.showOrCloseModal(false)
@@ -70,8 +69,13 @@ export default {
                 }
             }
         },
-        showOrCloseModal(show) {
+        showOrCloseModal(show, id) {
             this.showModal = show
+            if (id) {
+                this.editingCron = this.cronList.filter(x => x.id === id)[0]
+            } else {
+                this.editingCron = null
+            }
         },
     }
 }

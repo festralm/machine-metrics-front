@@ -58,7 +58,7 @@
       <div class="button-group">
           <router-link class="edit-button" :to="{name: 'EquipmentEdit', params: {id: equipment.id}}">Редактировать
           </router-link>
-          <button class="delete-button" @click="deleteEquipment">Удалить</button>
+          <button class="delete-button" @click="deleteCurrentEquipment()">Удалить</button>
       </div>
   </div>
 </template>
@@ -102,7 +102,7 @@ export default {
             const year = date.getFullYear()
             return `${day}.${month}.${year}`
         },
-        async deleteEquipment() {
+        async deleteCurrentEquipment() {
             await this.deleteEquipment(this.equipment.id);
             this.$router.push({name: 'EquipmentList'});
         },
