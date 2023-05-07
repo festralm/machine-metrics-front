@@ -14,7 +14,7 @@
 
 <script>
 export default {
-    name: "ServiceCreate",
+    name: "ServiceCreateModal",
     data() {
         return {
             name: '',

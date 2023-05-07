@@ -10,6 +10,9 @@
         <li>
             <router-link :to="{ name: 'ServiceList' }">Список сервисов</router-link>
         </li>
+        <li>
+            <router-link :to="{ name: 'CronExpressionList' }">Список cron-выражений</router-link>
+        </li>
     </ul>
   </div>
 </template>

@@ -1,11 +1,11 @@
-import Vuex from 'vuex'
+import {fetchWithResponseCheck} from '../utils';
 
 const API_URL = process.env.VUE_APP_API_URL
-const equipment = new Vuex.Store({
+const equipment = {
+    namespaced: true,
     state: {
         equipmentList: [],
         currentEquipment: null,
-        currentEquipmentStatistics: null,
     },
     mutations: {
         setEquipmentList(state, equipmentList) {
@@ -17,41 +17,22 @@ const equipment = new Vuex.Store({
         removeEquipmentFromList(state, equipmentId) {
             state.equipmentList = state.equipmentList.filter(equipment => equipment.id !== equipmentId)
         },
-        setCurrentEquipmentStatistics(state, equipmentStatistics) {
-            state.currentEquipmentStatistics = equipmentStatistics
-        },
     },
     actions: {
         async fetchEquipmentList({commit}) {
-            const response = await fetch(`${API_URL}/equipment`)
-            const equipmentList = await response.json()
-            commit('setEquipmentList', equipmentList)
+            try {
+                const response = await fetchWithResponseCheck(`${API_URL}/equipment`)
+                const equipmentList = await response.json()
+                commit('setEquipmentList', equipmentList)
+            } catch (error) {
+                console.log(error)
+            }
         },
         async fetchEquipmentById({commit}, id) {
             try {
-                const response = await fetch(`${API_URL}/equipment/${id}`)
+                const response = await fetchWithResponseCheck(`${API_URL}/equipment/${id}`)
                 const equipment = await response.json()
                 commit('setCurrentEquipment', equipment);
-            } catch (error) {
-                console.error(error);
-            }
-        },
-        async fetchEquipmentStatistics({commit}, data) {
-            try {
-                let url = `${API_URL}/equipment-data`;
-                if (data.id) {
-                    url += `?id=${data.id}`;
-                }
-                if (data.start) {
-                    url += `${data.id ? '&' : '?'}start=${data.start}`;
-                }
-                if (data.stop) {
-                    url += `${data.id || data.start ? '&' : '?'}stop=${data.stop}`;
-                }
-                const response = await fetch(url)
-                const equipmentStatistics = await response.json()
-                console.log(equipmentStatistics)
-                commit('setCurrentEquipmentStatistics', equipmentStatistics);
             } catch (error) {
                 console.error(error);
             }
@@ -62,7 +43,7 @@ const equipment = new Vuex.Store({
                 let updatedEquipment
 
                 if (equipmentData.id) {
-                    response = await fetch(`${API_URL}/equipment/${equipmentData.id}`, {
+                    response = await fetchWithResponseCheck(`${API_URL}/equipment/${equipmentData.id}`, {
                         method: 'PUT',
                         headers: {
                             'Content-Type': 'application/json'
@@ -72,7 +53,7 @@ const equipment = new Vuex.Store({
 
                     updatedEquipment = await response.json()
                 } else {
-                    response = await fetch(`${API_URL}/equipment`, {
+                    response = await fetchWithResponseCheck(`${API_URL}/equipment`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
@@ -84,19 +65,25 @@ const equipment = new Vuex.Store({
 
                     commit('setEquipmentList', [...state.equipmentList, updatedEquipment])
                 }
+                commit('setCurrentEquipment', updatedEquipment);
 
-                return {updatedEquipment, headers: response.headers}
+                return {ok: true, updatedEquipment, headers: response.headers}
             } catch (error) {
                 console.error(error)
+                return {ok: false}
             }
         },
-        async deleteEquipment({commit}, equipmentId) {
+        async deleteEquipment({state, commit}, equipmentId) {
             try {
-                const response = await fetch(`${API_URL}/equipment/${equipmentId}`, {
+                const response = await fetchWithResponseCheck(`${API_URL}/equipment/${equipmentId}`, {
                     method: 'DELETE'
                 })
 
                 commit('removeEquipmentFromList', equipmentId)
+                // todo check
+                if (state.currentEquipment != null && state.currentEquipment.id === equipmentId) {
+                    commit('setCurrentEquipment', null);
+                }
 
                 return response.ok
             } catch (error) {
@@ -108,6 +95,6 @@ const equipment = new Vuex.Store({
         getEquipmentList: state => state.equipmentList,
         getCurrentEquipment: state => state.currentEquipment
     }
-})
+}
 
 export default equipment

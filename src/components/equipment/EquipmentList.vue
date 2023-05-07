@@ -18,21 +18,26 @@
 <script>
 import EquipmentItem from './EquipmentItem.vue';
 import {RouterLink} from 'vue-router';
+import {mapActions, mapGetters} from 'vuex'
 
 export default {
-  name: "EquipmentList",
-  components: {
-    EquipmentItem,
-    RouterLink,
-  },
-  computed: {
-    equipmentList() {
-      return this.$store.getters.getEquipmentList;
+    name: "EquipmentList",
+    components: {
+        EquipmentItem,
+        RouterLink,
     },
-  },
-  created() {
-    this.$store.dispatch("fetchEquipmentList");
-  },
+    computed: {
+        equipmentList() {
+            return this.getEquipmentList();
+        },
+    },
+    created() {
+        this.fetchEquipmentList();
+    },
+    methods: {
+        ...mapGetters('equipment', ['getEquipmentList']),
+        ...mapActions('equipment', ['fetchEquipmentList']),
+    },
 }
 </script>
 

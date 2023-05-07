@@ -12,20 +12,20 @@
                 <p>Нет доступных сервисов</p>
             </div>
         </ul>
-        <button @click="showOrCloseModal(true)">Добавить оборудование</button>
-        <ServiceCreate v-if="showModal" @close="showOrCloseModal(false)" @save="saveService"></ServiceCreate>
+        <button @click="showOrCloseModal(true)">Добавить сервис</button>
+        <ServiceCreateModal v-if="showModal" @close="showOrCloseModal(false)"
+                            @save="createService"></ServiceCreateModal>
     </div>
 </template>
 
 <script>
-import DataServiceStore from "@/store/data-service";
-import dataServiceStore from "@/store/data-service";
-import ServiceCreate from '@/components/data-service/ServiceCreate.vue';
+import ServiceCreateModal from '@/components/data-service/ServiceCreateModal.vue';
+import {mapActions, mapGetters} from 'vuex'
 
 export default {
     name: "ServiceList",
     components: {
-        ServiceCreate
+        ServiceCreateModal
     },
     data() {
         return {
@@ -34,26 +34,21 @@ export default {
     },
     computed: {
         serviceList() {
-            return this.$store.getters.getServiceList;
+            return this.getServiceList();
         },
     },
     created() {
-        this.$store.dispatch("fetchServiceList");
+        this.fetchServiceList();
     },
     methods: {
-        async deleteService(id) {
-            try {
-                await DataServiceStore.dispatch('deleteService', id);
-            } catch (error) {
-                console.error(error);
-            }
-        },
-        async saveService(name) {
+        ...mapActions('dataService', ['fetchServiceList', 'deleteService', 'saveService']),
+        ...mapGetters('dataService', ['getServiceList']),
+        async createService(name) {
             const serviceData = {
                 name: name,
             }
-            try {
-                const response = await dataServiceStore.dispatch('saveService', serviceData)
+            const response = await this.saveService(serviceData)
+            if (response.ok) {
                 this.showOrCloseModal(false)
                 const locationHeader = response.headers.get('location')
 
@@ -62,9 +57,6 @@ export default {
                 } else {
                     console.warn('Could not find Location header in response:', response)
                 }
-
-            } catch (error) {
-                console.error(error)
             }
         },
         showOrCloseModal(show) {

@@ -50,7 +50,7 @@
 </template>
 
 <script>
-import equipmentStore from '@/store/equipment.js'
+import {mapActions} from 'vuex'
 
 export default {
   name: "EquipmentCreate",
@@ -69,35 +69,31 @@ export default {
     };
   },
   methods: {
-    async createEquipment() {
-      const equipmentData = {
-        inventoryNumber: this.inventoryNumber,
-        name: this.name,
-        cost: this.cost,
-        source: this.source,
-        department: this.department,
-        responsiblePerson: this.responsiblePerson,
-        status: this.status,
-        receiptDate: this.receiptDate ? new Date(this.receiptDate).toISOString() : null,
-        lastOperationDate: this.lastOperationDate ? new Date(this.receiptDate).toISOString() : null,
-      }
+      ...mapActions('equipment', ['saveEquipment']),
+      async createEquipment() {
+          const equipmentData = {
+              inventoryNumber: this.inventoryNumber,
+              name: this.name,
+              cost: this.cost,
+              source: this.source,
+              department: this.department,
+              responsiblePerson: this.responsiblePerson,
+              status: this.status,
+              receiptDate: this.receiptDate ? new Date(this.receiptDate).toISOString() : null,
+              lastOperationDate: this.lastOperationDate ? new Date(this.receiptDate).toISOString() : null,
+          }
 
-      try {
-        const response = await equipmentStore.dispatch('saveEquipment', equipmentData)
-        const locationHeader = response.headers.get('location')
+          const response = await this.saveEquipment(equipmentData)
+          if (response.ok) {
+              const locationHeader = response.headers.get('location')
 
-        if (locationHeader) {
-          this.$router.push(locationHeader)
-        } else {
-          console.warn('Could not find Location header in response:', response)
-        }
-      } catch (error) {
-        console.error(error)
-      }
-    },
-    onPhotoChange(event) {
-      this.photo = event.target.files[0];
-    },
+              if (locationHeader) {
+                  this.$router.push(locationHeader)
+              } else {
+                  console.warn('Could not find Location header in response:', response)
+              }
+          }
+      },
   },
 };
 </script>
