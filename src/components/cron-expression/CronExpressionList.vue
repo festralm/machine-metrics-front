@@ -60,13 +60,7 @@ export default {
             const response = await this.saveCronExpression(cronData)
             if (response.ok) {
                 this.showOrCloseModal(false)
-                const locationHeader = response.headers.get('location')
-
-                if (locationHeader) {
-                    this.$router.push(locationHeader)
-                } else {
-                    console.warn('Could not find Location header in response:', response)
-                }
+                this.$router.push({name: 'CronExpressionList'})
             }
         },
         showOrCloseModal(show, id) {

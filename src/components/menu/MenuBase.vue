@@ -16,13 +16,21 @@
         <li>
             <router-link :to="{ name: 'CronExpressionList' }">Список cron-выражений</router-link>
         </li>
+        <button class="logout-button" @click="keycloakLogout">Выйти</button>
     </ul>
   </div>
 </template>
 
 <script>
+
 export default {
-  name: "MenuBase"
+    name: "MenuBase",
+    methods: {
+        keycloakLogout() {
+            window.localStorage.removeItem('keycloakToken')
+            this.$keycloak.logout()
+        }
+    },
 }
 </script>
 
