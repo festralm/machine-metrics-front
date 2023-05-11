@@ -42,6 +42,7 @@ async function authenticateAgainstKeycloak() {
         if (!auth) {
             window.location.reload()
         }
+        store.commit('auth/setRole', keycloakGlobal.realmAccess.roles.filter(x => 'ADMIN' === x || 'USER' === x || 'MODERATOR' === x)[0])
     }).catch(() => {
         console.error("Authenticated Failed");
     });

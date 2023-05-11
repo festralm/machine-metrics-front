@@ -47,7 +47,7 @@
               <label for="cron-expression">Выражение Cron:</label>
               <span id="cron-expression">{{ equipmentSchedule.cron ? equipmentSchedule.cron.name : "" }}</span>
           </div>
-          <button @click="showOrCloseModal(true)">Изменить</button>
+          <button v-if="canEditInfo()" @click="showOrCloseModal(true)">Изменить</button>
           <EquipmentScheduleCreateModal v-if="showModal" :equipmentSchedule="equipmentSchedule"
                                         @close="showOrCloseModal(false)"
                                         @save="createEquipmentSchedule"></EquipmentScheduleCreateModal>
@@ -55,10 +55,11 @@
       <div>
           <EquipmentDataChart v-if="equipment" :equipmentId="$route.params.id"/>
       </div>
-      <div class="button-group">
-          <router-link class="edit-button" :to="{name: 'EquipmentEdit', params: {id: equipment.id}}">Редактировать
+      <div v-if="canDelete() || canUpdate()" class="button-group">
+          <router-link v-if="canUpdate()" class="edit-button" :to="{name: 'EquipmentEdit', params: {id: equipment.id}}">
+              Редактировать
           </router-link>
-          <button class="delete-button" @click="deleteCurrentEquipment()">Удалить</button>
+          <button v-if="canDelete()" class="delete-button" @click="deleteCurrentEquipment()">Удалить</button>
       </div>
   </div>
 </template>
@@ -82,7 +83,10 @@ export default {
         },
         equipmentSchedule() {
             return this.getCurrentEquipmentSchedule()
-        }
+        },
+        role() {
+            return this.getRole();
+        },
     },
     async created() {
         const equipmentId = this.$route.params.id
@@ -94,6 +98,7 @@ export default {
         ...mapGetters('equipment', ['getCurrentEquipment']),
         ...mapActions('equipmentSchedule', ['fetchEquipmentScheduleById', 'saveEquipmentSchedule']),
         ...mapGetters('equipmentSchedule', ['getCurrentEquipmentSchedule']),
+        ...mapGetters('auth', ['getRole']),
         formatDate(dateString) {
             if (!dateString) return ''
             const date = new Date(dateString)
@@ -122,6 +127,15 @@ export default {
         },
         showOrCloseModal(show) {
             this.showModal = show
+        },
+        canUpdate() {
+            return this.role === 'ADMIN' || this.role === 'MODERATOR'
+        },
+        canDelete() {
+            return this.role === 'ADMIN'
+        },
+        canEditInfo() {
+            return this.role === 'ADMIN' || this.role === 'MODERATOR'
         },
     },
 }

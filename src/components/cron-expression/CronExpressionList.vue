@@ -17,7 +17,7 @@
                         <span id="order">{{ cron.order }}</span>
                     </div>
                     <button @click="showOrCloseModal(true, cron.id)">Редактировать</button>
-                    <button @click="deleteCronExpression(cron.id)">Удалить</button>
+                    <button v-if="canDelete()" @click="deleteCronExpression(cron.id)">Удалить</button>
                 </li>
             </div>
             <div v-else>
@@ -49,6 +49,9 @@ export default {
         cronList() {
             return this.getCronList();
         },
+        role() {
+            return this.getRole();
+        },
     },
     created() {
         this.fetchCronExpressionsList();
@@ -56,6 +59,7 @@ export default {
     methods: {
         ...mapActions('cronExpression', ['fetchCronExpressionsList', 'deleteCronExpression', 'saveCronExpression']),
         ...mapGetters('cronExpression', ['getCronList']),
+        ...mapGetters('auth', ['getRole']),
         async createCron(cronData) {
             const response = await this.saveCronExpression(cronData)
             if (response.ok) {
@@ -70,6 +74,9 @@ export default {
             } else {
                 this.editingCron = null
             }
+        },
+        canDelete() {
+            return this.role === 'ADMIN'
         },
     }
 }

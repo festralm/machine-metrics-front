@@ -67,6 +67,11 @@ export default {
       }
     }
   },
+    computed: {
+        currentEquipment() {
+            return this.getCurrentEquipment() || {}
+        },
+    },
   created() {
       const equipmentId = this.$route.params.id;
       this.fetchEquipmentById(equipmentId);
@@ -85,11 +90,6 @@ export default {
                   console.error(error)
               })
       },
-  },
-  computed: {
-    currentEquipment() {
-        return this.getCurrentEquipment() || {}
-    },
   },
   watch: {
     currentEquipment: {

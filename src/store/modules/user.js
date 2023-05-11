@@ -81,7 +81,7 @@ const user = {
                         },
                         body: JSON.stringify(userData)
                     })
-                    updatedUser = await response.text()
+                    updatedUser = await response.json()
                     commit('setUserList', [])
                 }
 

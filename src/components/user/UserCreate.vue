@@ -69,7 +69,7 @@ export default {
 
             const response = await this.saveUser(userData)
             if (response.ok) {
-                this.$router.push({name: 'UserDetails', params: {id: response.updatedUser}})
+                this.$router.push({name: 'UserDetails', params: {id: response.updatedUser.id}})
             }
         },
     },

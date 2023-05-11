@@ -7,8 +7,11 @@ export async function fetchWithResponseCheck(url, init) {
         if (window.localStorage.getItem('keycloakToken')) {
             response = fetchAuthenticated(url, init)
         }
-    }
-    if (!response.ok) {
+    } else if (response.status === 403) {
+        window.location = "/forbidden"
+    } else if (response.status === 404) {
+        window.location = "/not-found"
+    } else if (!response.ok) {
         throw response;
     }
     return response;

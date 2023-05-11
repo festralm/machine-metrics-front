@@ -7,27 +7,36 @@
         <span>{{ equipment.inventoryNumber }}</span>
       </div>
     </div>
-    <button @click.stop="deleteEquipment(equipment.id)">Удалить</button>
+    <button v-if="canDelete()" @click.stop="deleteEquipment(equipment.id)">Удалить</button>
   </div>
 </template>
 
 <script>
-import {mapActions} from 'vuex'
+import {mapActions, mapGetters} from 'vuex'
 
 export default {
-  name: "EquipmentItem",
-  props: {
-    equipment: {
-      type: Object,
-      required: true,
+    name: "EquipmentItem",
+    props: {
+        equipment: {
+            type: Object,
+            required: true,
+        },
     },
-  },
-  methods: {
-      ...mapActions('equipment', ['deleteEquipment']),
-      goToDetails() {
-          this.$router.push({name: 'EquipmentDetails', params: {id: this.equipment.id}})
-      },
-  },
+    computed: {
+        role() {
+            return this.getRole();
+        },
+    },
+    methods: {
+        ...mapActions('equipment', ['deleteEquipment']),
+        ...mapGetters('auth', ['getRole']),
+        goToDetails() {
+            this.$router.push({name: 'EquipmentDetails', params: {id: this.equipment.id}})
+        },
+        canDelete() {
+            return this.role === 'ADMIN'
+        },
+    },
 }
 </script>
 

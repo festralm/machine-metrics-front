@@ -7,13 +7,13 @@
         <li>
             <router-link :to="{ name: 'EquipmentList' }">Оборудование</router-link>
         </li>
-        <li>
+        <li v-if="canGetUsers()">
             <router-link :to="{ name: 'UserList' }">Пользователи</router-link>
         </li>
-        <li>
+        <li v-if="canDataService()">
             <router-link :to="{ name: 'ServiceList' }">Список сервисов</router-link>
         </li>
-        <li>
+        <li v-if="canGetCron()">
             <router-link :to="{ name: 'CronExpressionList' }">Список cron-выражений</router-link>
         </li>
         <button class="logout-button" @click="keycloakLogout">Выйти</button>
@@ -37,6 +37,9 @@ export default {
         authUser() {
             return this.getAuthUser()
         },
+        role() {
+            return this.getRole();
+        },
     },
     async created() {
         await this.fetchAuthUser()
@@ -44,10 +47,20 @@ export default {
     methods: {
         ...mapActions('user', ['fetchAuthUser']),
         ...mapGetters('user', ['getAuthUser']),
+        ...mapGetters('auth', ['getRole']),
         keycloakLogout() {
             window.localStorage.removeItem('keycloakToken')
             logout()
-        }
+        },
+        canGetCron() {
+            return this.role === 'ADMIN' || this.role === 'MODERATOR'
+        },
+        canDataService() {
+            return this.role === 'ADMIN' || this.role === 'MODERATOR'
+        },
+        canGetUsers() {
+            return this.role === 'ADMIN'
+        },
     },
 }
 </script>

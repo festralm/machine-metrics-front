@@ -6,6 +6,7 @@ import user from './modules/user'
 import equipmentStatistics from './modules/equipmentStatistics'
 import equipmentSchedule from './modules/equipmentSchedule'
 import role from './modules/role'
+import auth from './modules/auth'
 
 export default createStore({
     modules: {
@@ -16,5 +17,6 @@ export default createStore({
         equipmentStatistics,
         equipmentSchedule,
         role,
+        auth,
     },
 })

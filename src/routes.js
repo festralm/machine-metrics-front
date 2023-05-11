@@ -9,6 +9,8 @@ import UserList from "@/components/user/UserList.vue";
 import UserCreate from "@/components/user/UserCreate.vue";
 import UserDetails from "./components/user/UserDetails.vue";
 import UserEdit from "./components/user/UserEdit.vue";
+import ResourceForbidden from "@/components/util/ResourceForbidden.vue";
+import NotFound from "@/components/util/NotFound.vue";
 
 const routes = [
     {
@@ -65,6 +67,16 @@ const routes = [
         path: "/user/:id",
         name: "UserDetails",
         component: UserDetails,
+    },
+    {
+        path: "/not-found",
+        name: "NotFound",
+        component: NotFound,
+    },
+    {
+        path: "/forbidden",
+        name: "ResourceForbidden",
+        component: ResourceForbidden,
     },
 ];
 
