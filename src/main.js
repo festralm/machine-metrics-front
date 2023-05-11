@@ -7,7 +7,7 @@ import store from "./store";
 import Keycloak from "keycloak-js";
 
 const initOptions = {
-    realm: 'Machinemetrics',
+    realm: 'master',
     clientId: 'frontend',
     url: process.env.VUE_APP_KEYCLOAK_URL,
     resource: "frontend",
@@ -17,47 +17,50 @@ const initOptions = {
 }
 const TOKEN_MIN_VALIDITY_SECONDS = 70
 
-const keycloak = new Keycloak(initOptions)
+var keycloakGlobal
 
-export async function authenticateAgainstKeycloak() {
-    await keycloak.init({onLoad: 'login-required'}).then((auth) => {
+// if (!window.localStorage.getItem('keycloakToken')) {
+    authenticateAgainstKeycloak().then(() => {
+        instantiateVueApp()
+    })
+// } else {
+//     instantiateVueApp()
+// }
+
+function instantiateVueApp() {
+    const app = createApp(App);
+    app
+        .use(store)
+        .use(router)
+        .component('VueDatePicker', VueDatePicker);
+    app.mount('#app');
+}
+
+async function authenticateAgainstKeycloak() {
+    keycloakGlobal = new Keycloak(initOptions)
+    await keycloakGlobal.init({onLoad: 'login-required'}).then((auth) => {
         if (!auth) {
             window.location.reload()
         }
     }).catch(() => {
         console.error("Authenticated Failed");
     });
-    await router.push('/')
 }
 
 export async function updateKeycloakToken() {
-    await keycloak.updateToken(TOKEN_MIN_VALIDITY_SECONDS).then(function (refreshed) {
+    await keycloakGlobal.updateToken(TOKEN_MIN_VALIDITY_SECONDS).then(function (refreshed) {
         if (refreshed) {
-            if (keycloak.token) {
-                window.localStorage.setItem('keycloakToken', keycloak.token)
+            if (keycloakGlobal.token) {
+                window.localStorage.setItem('keycloakToken', keycloakGlobal.token)
             }
         }
     }).catch(function () {
         console.log('Failed to refresh the token, or the session has expired');
         window.location.reload()
     });
-    return keycloak.token
+    return keycloakGlobal.token
 }
 
-function instantiateVueApp() {
-    const app = createApp(App);
-    app.config.globalProperties.$keycloak = keycloak;
-    app
-        .use(store)
-        .use(router)
-        .component('VueDatePicker', VueDatePicker)
-        .mount('#app');
-}
-
-if (!window.localStorage.getItem('keycloakToken')) {
-    authenticateAgainstKeycloak().then(() => {
-        instantiateVueApp()
-    })
-} else {
-    instantiateVueApp()
+export async function logout() {
+    keycloakGlobal.logout()
 }

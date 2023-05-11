@@ -1,11 +1,7 @@
 <template>
   <div class="user-item" @click="goToDetails">
     <div>
-      <h2>{{ user.name }}</h2>
-      <div class="info-group">
-        <label>Фамилия:</label>
-        <span>{{ user.surname }}</span>
-      </div>
+      <h2>{{ user.firstName }} {{ user.lastName }}</h2>
     </div>
     <button @click.stop="deleteUser(user.id)">Удалить</button>
   </div>

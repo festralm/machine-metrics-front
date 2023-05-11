@@ -3,12 +3,27 @@
         <h1 class="title">Создать пользователя</h1>
         <form @submit.prevent="createUser">
             <div class="form-group">
-                <label for="name">Имя*</label>
-                <input id="name" type="text" v-model="name" required/>
+                <label for="firstName">Имя</label>
+                <input id="firstName" type="text" v-model="firstName" required/>
             </div>
             <div class="form-group">
-                <label for="surname">Фамилия</label>
-                <input id="surname" type="text" v-model="surname"/>
+                <label for="lastName">Фамилия</label>
+                <input id="lastName" type="text" v-model="lastName" required/>
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input id="email" type="email" v-model="email" required/>
+            </div>
+            <div class="form-group">
+                <label for="password">Пароль</label>
+                <input id="password" type="password" v-model="password" required/>
+            </div>
+            <div class="form-group">
+                <label for="role">Роль</label>
+                <select id="role" v-model="roleName">
+                    <option value=""></option>
+                    <option v-for="role in roles" :key="role.id" :value="role.name">{{ role.description }}</option>
+                </select>
             </div>
             <div class="form-group">
                 <button class="save-button" type="submit">Сохранить</button>
@@ -18,27 +33,43 @@
 </template>
 
 <script>
-import {mapActions} from 'vuex'
+import {mapActions, mapGetters} from 'vuex'
 
 export default {
     name: "UserCreate",
     data() {
         return {
-            name: null,
-            surname: null,
+            firstName: null,
+            lastName: null,
+            email: null,
+            password: null,
+            roleName: null,
         };
     },
+    computed: {
+        roles() {
+            return this.getRoleList();
+        },
+    },
+    created() {
+        this.fetchRoleList();
+    },
     methods: {
+        ...mapActions('role', ['fetchRoleList']),
+        ...mapGetters('role', ['getRoleList']),
         ...mapActions('user', ['saveUser']),
         async createUser() {
             const userData = {
-                name: this.name,
-                surname: this.surname,
+                firstName: this.firstName,
+                lastName: this.lastName,
+                email: this.email,
+                password: this.password,
+                roleName: this.roleName,
             }
 
             const response = await this.saveUser(userData)
             if (response.ok) {
-                this.$router.push({name: 'UserDetails', params: {id: response.updatedUser.id}})
+                this.$router.push({name: 'UserDetails', params: {id: response.updatedUser}})
             }
         },
     },

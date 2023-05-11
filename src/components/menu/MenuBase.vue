@@ -18,17 +18,35 @@
         </li>
         <button class="logout-button" @click="keycloakLogout">Выйти</button>
     </ul>
+
+      <div v-if="authUser" class="user-info">
+          <p>{{ authUser.firstName }} {{ authUser.lastName }}</p>
+          <p>{{ authUser.realmRoles[0] }}</p>
+      </div>
   </div>
 </template>
 
 <script>
 
+import {logout} from "@/main";
+import {mapActions, mapGetters} from 'vuex'
+
 export default {
     name: "MenuBase",
+    computed: {
+        authUser() {
+            return this.getAuthUser()
+        },
+    },
+    async created() {
+        await this.fetchAuthUser()
+    },
     methods: {
+        ...mapActions('user', ['fetchAuthUser']),
+        ...mapGetters('user', ['getAuthUser']),
         keycloakLogout() {
             window.localStorage.removeItem('keycloakToken')
-            this.$keycloak.logout()
+            logout()
         }
     },
 }
