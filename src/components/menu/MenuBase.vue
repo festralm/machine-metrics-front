@@ -7,22 +7,61 @@
         <li>
             <router-link :to="{ name: 'EquipmentList' }">Оборудование</router-link>
         </li>
-        <li>
+        <li v-if="canGetUsers()">
             <router-link :to="{ name: 'UserList' }">Пользователи</router-link>
         </li>
-        <li>
+        <li v-if="canDataService()">
             <router-link :to="{ name: 'ServiceList' }">Список сервисов</router-link>
         </li>
-        <li>
+        <li v-if="canGetCron()">
             <router-link :to="{ name: 'CronExpressionList' }">Список cron-выражений</router-link>
         </li>
+        <button class="logout-button" @click="keycloakLogout">Выйти</button>
     </ul>
+
+      <div v-if="authUser" class="user-info">
+          <p>{{ authUser.firstName }} {{ authUser.lastName }}</p>
+          <p>{{ authUser.realmRoles[0] }}</p>
+      </div>
   </div>
 </template>
 
 <script>
+
+import {logout} from "@/main";
+import {mapActions, mapGetters} from 'vuex'
+
 export default {
-  name: "MenuBase"
+    name: "MenuBase",
+    computed: {
+        authUser() {
+            return this.getAuthUser()
+        },
+        role() {
+            return this.getRole();
+        },
+    },
+    async created() {
+        await this.fetchAuthUser()
+    },
+    methods: {
+        ...mapActions('user', ['fetchAuthUser']),
+        ...mapGetters('user', ['getAuthUser']),
+        ...mapGetters('auth', ['getRole']),
+        keycloakLogout() {
+            window.localStorage.removeItem('keycloakToken')
+            logout()
+        },
+        canGetCron() {
+            return this.role === 'ADMIN' || this.role === 'MODERATOR'
+        },
+        canDataService() {
+            return this.role === 'ADMIN' || this.role === 'MODERATOR'
+        },
+        canGetUsers() {
+            return this.role === 'ADMIN'
+        },
+    },
 }
 </script>
 

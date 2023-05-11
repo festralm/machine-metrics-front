@@ -1,19 +1,21 @@
 <template>
     <div class="container">
-        <div v-if="loaded" class="date-picker">
-            <VueDatePicker v-model="startPeriod" @update:model-value="saveStartDate" auto-apply
-                           :enable-time-picker="false"></VueDatePicker>
-            <VueDatePicker v-model="endPeriod" @update:model-value="saveEndDate" auto-apply
-                           :enable-time-picker="false"></VueDatePicker>
-        </div>
-        <div v-if="loaded" class="up-down-percent">
-            <div class="up-down-hours">
-                <span class="up-hours">{{ this.equipmentStatistics.upHours }} часов вкл</span> /
-                <span class="down-hours">{{ this.equipmentStatistics.downHours }} часов выкл</span>
+        <div v-if="loaded">
+            <div class="date-picker">
+                <VueDatePicker v-model="startPeriod" @update:model-value="saveStartDate" auto-apply
+                               :enable-time-picker="false"></VueDatePicker>
+                <VueDatePicker v-model="endPeriod" @update:model-value="saveEndDate" auto-apply
+                               :enable-time-picker="false"></VueDatePicker>
             </div>
-            <div class="percent">{{ this.equipmentStatistics.upPercent.toFixed(2) }}% вкл</div>
+            <div class="up-down-percent">
+                <div class="up-down-hours">
+                    <span class="up-hours">{{ this.equipmentStatistics.upHours }} часов вкл</span> /
+                    <span class="down-hours">{{ this.equipmentStatistics.downHours }} часов выкл</span>
+                </div>
+                <div class="percent">{{ this.equipmentStatistics.upPercent.toFixed(2) }}% вкл</div>
+            </div>
+            <Line :data="data" :options="options"/>
         </div>
-        <Line v-if="loaded" :data="data" :options="options"/>
     </div>
 </template>
 
@@ -56,38 +58,38 @@ export default {
         },
     },
     async created() {
-        this.loaded = false
         await this.fetchStatistics()
-        this.loaded = true
-        this.data = {
-            datasets: [
-                {
-                    data: this.equipmentStatistics.equipmentData.map(data => ({x: data.time, y: data.u})),
-                    label: 'Статистика',
-                    borderWidth: 1,
-                    borderColor: [
-                        'rgb(255, 99, 132)',
-                        'rgb(255, 159, 64)',
-                        'rgb(255, 205, 86)',
-                        'rgb(75, 192, 192)',
-                        'rgb(54, 162, 235)',
-                        'rgb(153, 102, 255)',
-                        'rgb(201, 203, 207)'
-                    ],
-                    backgroundColor: [
-                        'rgba(255, 99, 132, 0.2)',
-                        'rgba(255, 159, 64, 0.2)',
-                        'rgba(255, 205, 86, 0.2)',
-                        'rgba(75, 192, 192, 0.2)',
-                        'rgba(54, 162, 235, 0.2)',
-                        'rgba(153, 102, 255, 0.2)',
-                        'rgba(201, 203, 207, 0.2)'
-                    ]
-                }
-            ]
+        if (this.loaded) {
+            this.data = {
+                datasets: [
+                    {
+                        data: this.equipmentStatistics.equipmentData.map(data => ({x: data.time, y: data.u})),
+                        label: 'Статистика',
+                        borderWidth: 1,
+                        borderColor: [
+                            'rgb(255, 99, 132)',
+                            'rgb(255, 159, 64)',
+                            'rgb(255, 205, 86)',
+                            'rgb(75, 192, 192)',
+                            'rgb(54, 162, 235)',
+                            'rgb(153, 102, 255)',
+                            'rgb(201, 203, 207)'
+                        ],
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.2)',
+                            'rgba(255, 159, 64, 0.2)',
+                            'rgba(255, 205, 86, 0.2)',
+                            'rgba(75, 192, 192, 0.2)',
+                            'rgba(54, 162, 235, 0.2)',
+                            'rgba(153, 102, 255, 0.2)',
+                            'rgba(201, 203, 207, 0.2)'
+                        ]
+                    }
+                ]
+            }
+            this.startPeriod = new Date(this.equipmentStatistics.start)
+            this.endPeriod = new Date(this.equipmentStatistics.end)
         }
-        this.startPeriod = new Date(this.equipmentStatistics.start)
-        this.endPeriod = new Date(this.equipmentStatistics.end)
     },
     methods: {
         ...mapGetters('equipmentStatistics', ['getCurrentEquipmentStatistics']),
@@ -101,6 +103,7 @@ export default {
             await this.fetchStatistics()
         },
         async fetchStatistics() {
+            this.loaded = false
             await this.fetchEquipmentStatistics(
                 {
                     id: this.equipmentId,
@@ -108,6 +111,7 @@ export default {
                     stop: this.endPeriod ? this.endPeriod.toISOString() : null
                 }
             )
+            this.loaded = !!this.equipmentStatistics
         },
     }
 }

@@ -5,7 +5,7 @@
             <div v-if="serviceList.length > 0">
                 <li v-for="service in serviceList" :key="service.id">
                     <span>{{ service.name }}</span>
-                    <button @click="deleteService(service.id)">Удалить</button>
+                    <button v-if="canDelete()" @click="deleteService(service.id)">Удалить</button>
                 </li>
             </div>
             <div v-else>
@@ -36,6 +36,9 @@ export default {
         serviceList() {
             return this.getServiceList();
         },
+        role() {
+            return this.getRole();
+        },
     },
     created() {
         this.fetchServiceList();
@@ -43,6 +46,7 @@ export default {
     methods: {
         ...mapActions('dataService', ['fetchServiceList', 'deleteService', 'saveService']),
         ...mapGetters('dataService', ['getServiceList']),
+        ...mapGetters('auth', ['getRole']),
         async createService(name) {
             const serviceData = {
                 name: name,
@@ -50,17 +54,15 @@ export default {
             const response = await this.saveService(serviceData)
             if (response.ok) {
                 this.showOrCloseModal(false)
-                const locationHeader = response.headers.get('location')
 
-                if (locationHeader) {
-                    this.$router.push(locationHeader)
-                } else {
-                    console.warn('Could not find Location header in response:', response)
-                }
+                this.$router.push({name: 'ServiceList'})
             }
         },
         showOrCloseModal(show) {
             this.showModal = show
+        },
+        canDelete() {
+            return this.role === 'ADMIN'
         },
     }
 }

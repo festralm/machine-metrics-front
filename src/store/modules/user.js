@@ -6,6 +6,7 @@ const user = {
     state: {
         userList: [],
         currentUser: null,
+        authUser: null,
     },
     mutations: {
         setUserList(state, userList) {
@@ -13,6 +14,9 @@ const user = {
         },
         setCurrentUser(state, user) {
             state.currentUser = user
+        },
+        setAuthUser(state, user) {
+            state.authUser = user
         },
         removeUserFromList(state, userId) {
             state.userList = state.userList.filter(user => user.id !== userId)
@@ -44,7 +48,16 @@ const user = {
                 console.error(error);
             }
         },
-        async saveUser({state, commit}, userData) {
+        async fetchAuthUser({commit}) {
+            try {
+                const response = await fetchWithResponseCheck(`${API_URL}/user/current`)
+                const user = await response.json()
+                commit('setAuthUser', user);
+            } catch (error) {
+                console.error(error);
+            }
+        },
+        async saveUser({commit}, userData) {
             try {
                 let response
                 let updatedUser
@@ -69,7 +82,7 @@ const user = {
                         body: JSON.stringify(userData)
                     })
                     updatedUser = await response.json()
-                    commit('setUserList', [...state.userList, updatedUser])
+                    commit('setUserList', [])
                 }
 
                 commit('setCurrentUser', updatedUser);
@@ -99,7 +112,8 @@ const user = {
     },
     getters: {
         getUserList: state => state.userList,
-        getCurrentUser: state => state.currentUser
+        getCurrentUser: state => state.currentUser,
+        getAuthUser: state => state.authUser,
     }
 }
 

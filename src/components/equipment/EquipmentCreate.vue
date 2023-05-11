@@ -85,13 +85,7 @@ export default {
 
           const response = await this.saveEquipment(equipmentData)
           if (response.ok) {
-              const locationHeader = response.headers.get('location')
-
-              if (locationHeader) {
-                  this.$router.push(locationHeader)
-              } else {
-                  console.warn('Could not find Location header in response:', response)
-              }
+              this.$router.push({name: 'EquipmentDetails', params: {id: response.updatedEquipment.id}})
           }
       },
   },

@@ -9,9 +9,11 @@
     <div v-else>
       <p class="no-equipment">Нет доступного оборудования</p>
     </div>
-    <router-link :to="{ name: 'EquipmentCreate' }">
-      <button class="create-button">Создать оборудование</button>
-    </router-link>
+      <div v-if="canCreate()">
+          <router-link :to="{ name: 'EquipmentCreate' }">
+              <button class="create-button">Создать оборудование</button>
+          </router-link>
+      </div>
   </div>
 </template>
 
@@ -30,6 +32,9 @@ export default {
         equipmentList() {
             return this.getEquipmentList();
         },
+        role() {
+            return this.getRole();
+        },
     },
     created() {
         this.fetchEquipmentList();
@@ -37,6 +42,10 @@ export default {
     methods: {
         ...mapGetters('equipment', ['getEquipmentList']),
         ...mapActions('equipment', ['fetchEquipmentList']),
+        ...mapGetters('auth', ['getRole']),
+        canCreate() {
+            return this.role === 'ADMIN' || this.role === 'MODERATOR'
+        }
     },
 }
 </script>

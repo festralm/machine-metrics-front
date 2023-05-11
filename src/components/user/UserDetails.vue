@@ -1,9 +1,13 @@
 <template>
     <div class="user-detail" v-if="user">
-        <h1 class="title">{{ user.name }}</h1>
+        <h1 class="title">{{ user.firstName }} {{ user.lastName }}</h1>
         <div class="info-group">
-            <label for="surname">Фамилия:</label>
-            <span id="surname">{{ user.surname }}</span>
+            <label for="surname">Email:</label>
+            <span id="surname">{{ user.username }}</span>
+        </div>
+        <div class="info-group">
+            <label for="role">Роль:</label>
+            <span id="role">{{ user.realmRoles[0] }}</span>
         </div>
         <div class="button-group">
             <router-link class="edit-button" :to="{name: 'UserEdit', params: {id: user.id}}">Редактировать
