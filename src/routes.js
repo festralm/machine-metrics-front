@@ -11,6 +11,11 @@ import UserDetails from "./components/user/UserDetails.vue";
 import UserEdit from "./components/user/UserEdit.vue";
 import ResourceForbidden from "@/components/util/ResourceForbidden.vue";
 import NotFound from "@/components/util/NotFound.vue";
+import CountryList from "@/components/country/CountryList.vue";
+import PurposeList from "@/components/purpose/PurposeList.vue";
+import StatusList from "@/components/status/StatusList.vue";
+import UnitList from "@/components/unit/UnitList.vue";
+import UsageTypeList from "@/components/usageType/UsageTypeList.vue";
 
 const routes = [
     {
@@ -77,6 +82,31 @@ const routes = [
         path: "/forbidden",
         name: "ResourceForbidden",
         component: ResourceForbidden,
+    },
+    {
+        path: "/country",
+        name: "CountryList",
+        component: CountryList,
+    },
+    {
+        path: "/purpose",
+        name: "PurposeList",
+        component: PurposeList,
+    },
+    {
+        path: "/status",
+        name: "StatusList",
+        component: StatusList,
+    },
+    {
+        path: "/unit",
+        name: "UnitList",
+        component: UnitList,
+    },
+    {
+        path: "/usage-type",
+        name: "UsageTypeList",
+        component: UsageTypeList,
     },
 ];
 
