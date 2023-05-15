@@ -13,6 +13,7 @@ import usageType from './modules/usageType'
 import country from './modules/country'
 import unit from './modules/unit'
 import status from './modules/status'
+import schedule from './modules/schedule'
 
 export default createStore({
     modules: {
@@ -30,5 +31,6 @@ export default createStore({
         country,
         unit,
         status,
+        schedule,
     },
 })

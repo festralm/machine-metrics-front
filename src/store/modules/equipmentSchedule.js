@@ -14,9 +14,9 @@ const equipmentSchedule = {
     actions: {
         async fetchEquipmentScheduleById({commit}, id) {
             try {
-                const response = await fetchWithResponseCheck(`${API_URL}/equipment-info/${id}`)
+                const response = await fetchWithResponseCheck(`${API_URL}/equipment-info/${id}`, {}, true)
                 var equipmentSchedule
-                    equipmentSchedule = await response.json()
+                equipmentSchedule = await response.json()
             } catch (error) {
                 if (error.status === 404) {
                     equipmentSchedule = {enabled: false}

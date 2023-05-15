@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import UsageTypeCreateModal from '@/components/usageType/UsageTypeCreateModal.vue';
+import UsageTypeCreateModal from '@/components/usage-type/UsageTypeCreateModal.vue';
 import {mapActions, mapGetters} from 'vuex'
 
 export default {

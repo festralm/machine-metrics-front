@@ -78,11 +78,11 @@
         </div>
         <div class="info-group">
             <label for="purpose">Назначение</label>
-            <span id="purpose">{{ equipment.purpose }}</span>
+            <span id="purpose">{{ equipment.purpose ? equipment.purpose.name : null }}</span>
         </div>
         <div class="info-group">
             <label for="usageType">Тип использования</label>
-            <span id="usageType">{{ equipment.usageType }}</span>
+            <span id="usageType">{{ equipment.usageType ? equipment.usageType.name : null }}</span>
         </div>
         <div class="info-group">
             <label for="verificationRequired">Требуется поверка оборудования</label>
@@ -98,7 +98,7 @@
         </div>
         <div class="info-group">
             <label for="manufacturerCountry">Страна-изготовитель</label>
-            <span id="manufacturerCountry">{{ equipment.manufacturerCountry }}</span>
+            <span id="manufacturerCountry">{{ equipment.manufacturerCountry ? equipment.manufacturerCountry.name : null }}</span>
         </div>
         <div class="info-group">
             <label for="manufactureYear">Год изготовления</label>
@@ -155,7 +155,7 @@
         </div>
         <div class="info-group">
             <label for="unit">Подразделение</label>
-            <span id="unit">{{ equipment.unit }}</span>
+            <span id="unit">{{ equipment.unit ? equipment.unit.name : null }}</span>
         </div>
         <div class="info-group">
             <label for="responsiblePerson">Лицо, ответственное за функционирование оборудования</label>
@@ -163,7 +163,7 @@
         </div>
         <div class="info-group">
             <label for="status">Статус оборудования</label>
-            <span id="status">{{ equipment.status }}</span>
+            <span id="status">{{ equipment.status ? equipment.status.name : null }}</span>
         </div>
         <div class="info-group">
             <label for="lastOperationDate">Дата последней операции</label>
@@ -235,7 +235,7 @@ export default {
         const equipmentId = this.$route.params.id;
         await this.fetchEquipmentById(equipmentId);
         await this.fetchEquipmentScheduleById(equipmentId);
-        this.fetchEquipmentPhoto({id: equipmentId, path: this.equipment.photoPath});
+        await this.fetchEquipmentPhoto({id: equipmentId, path: this.equipment.photoPath});
     },
     methods: {
         ...mapActions('equipment', ['fetchEquipmentById', 'deleteEquipment']),
@@ -258,6 +258,7 @@ export default {
             this.$router.push({name: 'EquipmentList'});
         },
         async createEquipmentSchedule(equipmentSchedule) {
+            console.log(this.$route.params.id)
             equipmentSchedule.id = this.$route.params.id
             if (!equipmentSchedule.dataServiceId) {
                 equipmentSchedule.dataServiceId = null

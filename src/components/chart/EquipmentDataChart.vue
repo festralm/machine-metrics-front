@@ -14,7 +14,7 @@
                 </div>
                 <div class="percent">{{ this.equipmentStatistics.upPercent.toFixed(2) }}% вкл</div>
             </div>
-            <Line :data="data" :options="options"/>
+            <Line v-if="lineData" :data="lineData" :options="options"/>
         </div>
     </div>
 </template>
@@ -47,6 +47,7 @@ export default {
     data() {
         return {
             loaded: false,
+            lineData: null,
             options: {},
             startPeriod: null,
             endPeriod: null,
@@ -60,35 +61,20 @@ export default {
     async created() {
         await this.fetchStatistics()
         if (this.loaded) {
-            this.data = {
-                datasets: [
-                    {
-                        data: this.equipmentStatistics.equipmentData.map(data => ({x: data.time, y: data.u})),
-                        label: 'Статистика',
-                        borderWidth: 1,
-                        borderColor: [
-                            'rgb(255, 99, 132)',
-                            'rgb(255, 159, 64)',
-                            'rgb(255, 205, 86)',
-                            'rgb(75, 192, 192)',
-                            'rgb(54, 162, 235)',
-                            'rgb(153, 102, 255)',
-                            'rgb(201, 203, 207)'
-                        ],
-                        backgroundColor: [
-                            'rgba(255, 99, 132, 0.2)',
-                            'rgba(255, 159, 64, 0.2)',
-                            'rgba(255, 205, 86, 0.2)',
-                            'rgba(75, 192, 192, 0.2)',
-                            'rgba(54, 162, 235, 0.2)',
-                            'rgba(153, 102, 255, 0.2)',
-                            'rgba(201, 203, 207, 0.2)'
-                        ]
-                    }
-                ]
+            console.log(this.equipmentStatistics.equipmentData.length)
+            if (this.equipmentStatistics && this.equipmentStatistics.equipmentData && this.equipmentStatistics.equipmentData.length > 0) {
+                this.lineData = {
+                    datasets: [
+                        {
+                            data: this.equipmentStatistics.equipmentData.map(data => ({x: data.time, y: data.u})),
+                            label: 'Статистика',
+                            borderWidth: 1,
+                        }
+                    ]
+                }
+                this.startPeriod = new Date(this.equipmentStatistics.start)
+                this.endPeriod = new Date(this.equipmentStatistics.end)
             }
-            this.startPeriod = new Date(this.equipmentStatistics.start)
-            this.endPeriod = new Date(this.equipmentStatistics.end)
         }
     },
     methods: {

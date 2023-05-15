@@ -5,7 +5,8 @@
             <div class="form-group">
                 <img class="photo" :src="photoUrl" alt="Equipment Photo" v-if="photoUrl">
                 <input id="photo" type="file" ref="photoInput" accept="image/*" @change="onPhotoChange()"/>
-                <input v-if="formData.photoPath" id="photo-delete" type="button" @click="clearPhoto()" value="Удалить фото"/>
+                <input v-if="formData.photoPath" id="photo-delete" type="button" @click="clearPhoto()"
+                       value="Удалить фото"/>
             </div>
             <div class="form-group">
                 <label for="name">Наименование оборудования*</label>
@@ -150,7 +151,6 @@
             </div>
             <div class="form-group">
                 <label for="delivery-date">Дата поставки</label>
-                <!--                @update:model-value="formData.deliveryDate"-->
                 <VueDatePicker v-model="formData.deliveryDate" auto-apply
                                :enable-time-picker="false"></VueDatePicker>
             </div>
@@ -311,15 +311,15 @@ export default {
             return null;
         },
     },
-    created() {
+    async created() {
         const equipmentId = this.$route.params.id;
-        this.fetchEquipmentById(equipmentId);
-        this.fetchPurposeList();
-        this.fetchUsageTypeList();
-        this.fetchCountryList();
-        this.fetchUnitList();
-        this.fetchStatusList();
-        this.fetchEquipmentPhoto({id: equipmentId, path: this.formData.photoPath});
+        await this.fetchEquipmentById(equipmentId);
+        await this.fetchPurposeList();
+        await this.fetchUsageTypeList();
+        await this.fetchCountryList();
+        await this.fetchUnitList();
+        await this.fetchStatusList();
+        await this.fetchEquipmentPhoto({id: equipmentId, path: this.currentEquipment.photoPath});
     },
     methods: {
         ...mapActions('equipment', ['saveEquipment', 'fetchEquipmentById']),
@@ -414,12 +414,12 @@ export default {
                     researchObjects: equipment.researchObjects,
                     indicators: equipment.indicators,
                     additionalFeatures: equipment.additionalFeatures,
-                    purpose: equipment.purpose,
-                    usageType: equipment.usageType,
+                    purpose: equipment.purpose ? equipment.purpose.id : null,
+                    usageType: equipment.usageType ? equipment.usageType.id : null,
                     verificationRequired: equipment.verificationRequired,
                     type: equipment.type,
                     factoryNumber: equipment.factoryNumber,
-                    manufacturerCountry: equipment.manufacturerCountry,
+                    manufacturerCountry: equipment.manufacturerCountry ? equipment.manufacturerCountry.id : null,
                     manufactureYear: equipment.manufactureYear,
                     manufacturer: equipment.manufacturer,
                     supplier: equipment.supplier,
@@ -432,13 +432,13 @@ export default {
                     collectiveInterdisciplinaryCenterUse: equipment.collectiveInterdisciplinaryCenterUse,
                     portalPublicationCardReadiness: equipment.portalPublicationCardReadiness,
                     installationLocation: equipment.installationLocation,
-                    unit: equipment.unit,
+                    unit: equipment.unit ? equipment.unit.id : null,
                     responsiblePerson: equipment.responsiblePerson,
-                    status: equipment.status,
+                    status: equipment.status ? equipment.status.id : null,
                     photoPath: equipment.photoPath,
                 }
             },
-            immediate: true, // update form data immediately after mounted
+            immediate: true,
         },
     },
 }
