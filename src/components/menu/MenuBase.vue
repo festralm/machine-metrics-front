@@ -10,11 +10,26 @@
         <li v-if="canGetUsers()">
             <router-link :to="{ name: 'UserList' }">Пользователи</router-link>
         </li>
-        <li v-if="canDataService()">
+        <li v-if="canGetDataService()">
             <router-link :to="{ name: 'ServiceList' }">Список сервисов</router-link>
         </li>
         <li v-if="canGetCron()">
             <router-link :to="{ name: 'CronExpressionList' }">Список cron-выражений</router-link>
+        </li>
+        <li v-if="canGetCountry()">
+            <router-link :to="{ name: 'CountryList' }">Список стран</router-link>
+        </li>
+        <li v-if="canGetPurpose()">
+            <router-link :to="{ name: 'PurposeList' }">Список назначений</router-link>
+        </li>
+        <li v-if="canGetStatus()">
+            <router-link :to="{ name: 'StatusList' }">Список статусов</router-link>
+        </li>
+        <li v-if="canGetUnit()">
+            <router-link :to="{ name: 'UnitList' }">Список подразделений</router-link>
+        </li>
+        <li v-if="canGetUsageType()">
+            <router-link :to="{ name: 'UsageTypeList' }">Список типов использования</router-link>
         </li>
         <button class="logout-button" @click="keycloakLogout">Выйти</button>
     </ul>
@@ -52,14 +67,29 @@ export default {
             window.localStorage.removeItem('keycloakToken')
             logout()
         },
+        canGetUsers() {
+            return this.role === 'ADMIN'
+        },
         canGetCron() {
             return this.role === 'ADMIN' || this.role === 'MODERATOR'
         },
-        canDataService() {
+        canGetDataService() {
             return this.role === 'ADMIN' || this.role === 'MODERATOR'
         },
-        canGetUsers() {
-            return this.role === 'ADMIN'
+        canGetCountry() {
+            return this.role === 'ADMIN' || this.role === 'MODERATOR'
+        },
+        canGetPurpose() {
+            return this.role === 'ADMIN' || this.role === 'MODERATOR'
+        },
+        canGetStatus() {
+            return this.role === 'ADMIN' || this.role === 'MODERATOR'
+        },
+        canGetUnit() {
+            return this.role === 'ADMIN' || this.role === 'MODERATOR'
+        },
+        canGetUsageType() {
+            return this.role === 'ADMIN' || this.role === 'MODERATOR'
         },
     },
 }
