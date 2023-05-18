@@ -2,6 +2,10 @@
     <div class="container">
         <div v-if="loaded">
             <div class="date-picker">
+                <p>Расписание оборудования</p>
+                {{ this.equipmentStatistics.schedules }}
+            </div>
+            <div class="date-picker">
                 <VueDatePicker v-model="startPeriod" @update:model-value="saveStartDate" auto-apply
                                :enable-time-picker="false"></VueDatePicker>
                 <VueDatePicker v-model="endPeriod" @update:model-value="saveEndDate" auto-apply
@@ -20,10 +24,20 @@
 </template>
 
 <script>
-import {CategoryScale, Chart as ChartJS, Legend, LinearScale, LineElement, PointElement, Title, Tooltip} from 'chart.js'
+import {
+    CategoryScale,
+    Decimation,
+    Chart as ChartJS,
+    Legend,
+    LinearScale,
+    LineElement,
+    PointElement,
+    Title,
+    Tooltip, TimeScale,
+} from 'chart.js'
 import {Line} from 'vue-chartjs'
 import {mapActions, mapGetters} from 'vuex'
-
+import 'chartjs-adapter-luxon'
 
 ChartJS.register(
     CategoryScale,
@@ -32,7 +46,9 @@ ChartJS.register(
     LineElement,
     Title,
     Tooltip,
-    Legend
+    Legend,
+    Decimation,
+    TimeScale,
 )
 
 export default {
@@ -47,8 +63,6 @@ export default {
     data() {
         return {
             loaded: false,
-            lineData: null,
-            options: {},
             startPeriod: null,
             endPeriod: null,
         }
@@ -57,21 +71,165 @@ export default {
         equipmentStatistics() {
             return this.getCurrentEquipmentStatistics()
         },
+        lineData() {
+            return {
+                labels: this.equipmentStatistics.equipmentData.map(data => data.time),
+                datasets: [
+                    {
+                        data: this.equipmentStatistics.equipmentData.map(x => {
+                            x.x = x.time
+                            return x
+                        }),
+                        label: 'U',
+                        parsing: {
+                            yAxisKey: 'u'
+                        },
+                    }
+                ]
+            }
+        },
+        options() {
+            return {
+                locale: 'RU',
+                animations: {
+                    tension: {
+                        duration: 1000,
+                        easing: 'linear',
+                        from: 1,
+                        to: 0,
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false,
+                        labels: {
+                            font: {
+                                // family: "'Helvetica Neue', 'Helvetica', 'Arial', sans-serif",
+                                size: 20,
+                                weight: 'bold',
+                            }
+                        }
+                    },
+                    decimation: {
+                        enabled: true,
+                    },
+                    tooltip: {
+                        titleAlign: 'center',
+                        bodyAlign: 'center',
+                        usePointStyle: true,
+                        callbacks: {
+                            label: function (context) {
+                                let label = context.dataset.label || '';
+
+                                const index = context.dataIndex;
+                                const value = context.dataset.data[index];
+
+                                if (label) {
+                                    label = ' ' + label + ': ';
+                                }
+                                if (context.parsed.y !== null) {
+                                    label += context.parsed.y.toFixed(2)
+                                        + (
+                                            value.enabledDuringPassiveTime ? `, включено вне рабочего времени` :
+                                                value.disabledDuringActiveTime ? `, выключено в рабочее время` :
+                                                    (!value.enabledDuringPassiveTime && value.enabled) ? ', включено' :
+                                                        ', выключено'
+                                        );
+                                }
+                                return label;
+                            }
+                        }
+                    },
+                },
+                borderWidth: 1,
+                borderColor: 'rgba(0, 0, 0, 0.2)',
+                pointHoverBackgroundColor: function (context) {
+                    var transitivity = 1;
+                    const index = context.dataIndex;
+                    const value = context.dataset.data[index];
+                    if (value) {
+                        return value.enabledDuringPassiveTime ? `rgb(255, 186, 0, ${transitivity})` :
+                            value.disabledDuringActiveTime ? `rgb(255, 0, 0, ${transitivity})` : `rgba(0, 0, 0, ${transitivity})`;
+                    }
+                },
+                pointBackgroundColor: function (context) {
+                    var transitivity = 0.5;
+                    const index = context.dataIndex;
+                    const value = context.dataset.data[index];
+                    if (value) {
+                        return value.enabledDuringPassiveTime ? `rgb(255, 186, 0, ${transitivity})` :
+                            value.disabledDuringActiveTime ? `rgb(255, 0, 0, ${transitivity})` : `rgba(0, 0, 0, ${transitivity})`;
+                    }
+                },
+                pointBorderColor: function (context) {
+                    var transitivity = 0.2;
+                    const index = context.dataIndex;
+                    const value = context.dataset.data[index];
+                    if (value) {
+                        return value.enabledDuringPassiveTime ? `rgb(255, 186, 0, ${transitivity})` :
+                            value.disabledDuringActiveTime ? `rgb(255, 0, 0, ${transitivity})` : `rgba(0, 0, 0, ${transitivity})`;
+                    }
+                },
+                pointHoverBorderColor: function (context) {
+                    var transitivity = 0.5;
+                    const index = context.dataIndex;
+                    const value = context.dataset.data[index];
+                    if (value) {
+                        return value.enabledDuringPassiveTime ? `rgb(255, 186, 0, ${transitivity})` :
+                            value.disabledDuringActiveTime ? `rgb(255, 0, 0, ${transitivity})` : `rgba(0, 0, 0, ${transitivity})`;
+                    }
+                },
+                pointBorderWidth: 2,
+                pointHoverBorderWidth: 3,
+                pointRadius: 4,
+                pointHoverRadius: 6,
+                cubicInterpolationMode: 'default',
+                scales: {
+                    y: {
+                        display: true,
+                        title: {
+                            color: 'rgba(0,0,0, 1)',
+                            display: true,
+                            text: 'U',
+                            font: {
+                                // family: "'Helvetica Neue', 'Helvetica', 'Arial', sans-serif",
+                                size: 15,
+                            }
+                        },
+                    },
+                    x: {
+                        adapters: {
+                            date: {
+                                locale: 'ru-RU'
+                            }
+                        },
+                        min: this.startPeriod,
+                        max: this.endPeriod,
+                        type: 'time',
+                        time: {
+                            displayFormats: {
+                                hour: 'hh:mm dd MMMM',
+                            }
+                        },
+                        display: true,
+                        title: {
+                            color: 'rgba(0, 0, 0, 1)',
+                            display: true,
+                            text: 'Время замера',
+                            font: {
+                                // family: "'Helvetica Neue', 'Helvetica', 'Arial', sans-serif",
+                                size: 15,
+                            }
+                        },
+                    },
+                }
+            }
+        },
     },
     async created() {
         await this.fetchStatistics()
         if (this.loaded) {
-            console.log(this.equipmentStatistics.equipmentData.length)
             if (this.equipmentStatistics && this.equipmentStatistics.equipmentData && this.equipmentStatistics.equipmentData.length > 0) {
-                this.lineData = {
-                    datasets: [
-                        {
-                            data: this.equipmentStatistics.equipmentData.map(data => ({x: data.time, y: data.u})),
-                            label: 'Статистика',
-                            borderWidth: 1,
-                        }
-                    ]
-                }
                 this.startPeriod = new Date(this.equipmentStatistics.start)
                 this.endPeriod = new Date(this.equipmentStatistics.end)
             }

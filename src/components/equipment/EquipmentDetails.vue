@@ -1,6 +1,9 @@
 <template>
     <div class="equipment-detail" v-if="equipment">
         <h1 class="title">{{ equipment.name }}</h1>
+        <div>
+            <EquipmentDataChart v-if="equipment" :equipmentId="$route.params.id"/>
+        </div>
         <img class="photo" :src="photoUrl" alt="Equipment Photo" v-if="photoUrl">
         <div class="info-group">
             <label for="inventory-number">Инвентарный номер</label>
@@ -191,9 +194,6 @@
                                           @close="showOrCloseModal(false)"
                                           @save="createEquipmentSchedule"></EquipmentScheduleCreateModal>
         </div>
-        <div>
-            <EquipmentDataChart v-if="equipment" :equipmentId="$route.params.id"/>
-        </div>
         <div v-if="canDelete() || canUpdate()" class="button-group">
             <router-link v-if="canUpdate()" class="edit-button"
                          :to="{name: 'EquipmentEdit', params: {id: equipment.id}}">
@@ -290,7 +290,7 @@ export default {
 
 <style scoped>
 .equipment-detail {
-    max-width: 800px;
+    max-width: 1000px;
     margin: 0 auto;
     padding: 20px;
     background-color: #fff;
