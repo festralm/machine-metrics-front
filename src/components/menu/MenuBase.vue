@@ -31,6 +31,9 @@
         <li v-if="canGetUsageType()">
             <router-link :to="{ name: 'UsageTypeList' }">Список типов использования</router-link>
         </li>
+        <li v-if="canGetSchedule()">
+            <router-link :to="{ name: 'ScheduleList' }">Список расписаний</router-link>
+        </li>
         <button class="logout-button" @click="keycloakLogout">Выйти</button>
     </ul>
 
@@ -89,6 +92,9 @@ export default {
             return this.role === 'ADMIN' || this.role === 'MODERATOR'
         },
         canGetUsageType() {
+            return this.role === 'ADMIN' || this.role === 'MODERATOR'
+        },
+        canGetSchedule() {
             return this.role === 'ADMIN' || this.role === 'MODERATOR'
         },
     },

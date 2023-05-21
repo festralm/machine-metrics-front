@@ -1,15 +1,15 @@
 import {updateKeycloakToken} from "@/main";
 
-export async function fetchWithResponseCheck(url, init) {
+export async function fetchWithResponseCheck(url, init, throwException) {
     let response = await fetchAuthenticated(url, init)
     if (response.status === 401) {
         await updateKeycloakToken()
         if (window.localStorage.getItem('keycloakToken')) {
             response = fetchAuthenticated(url, init)
         }
-    } else if (response.status === 403) {
+    } else if (!throwException && response.status === 403) {
         window.location = "/forbidden"
-    } else if (response.status === 404) {
+    } else if (!throwException && response.status === 404) {
         window.location = "/not-found"
     } else if (!response.ok) {
         throw response;

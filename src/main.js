@@ -5,6 +5,7 @@ import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css'
 import store from "./store";
 import Keycloak from "keycloak-js";
+import 'vue3-timepicker/dist/VueTimepicker.css'
 
 const initOptions = {
     realm: 'master',
