@@ -2,17 +2,23 @@
     <div class="modal">
         <div class="modal-content">
             <h2>Добавить расписание</h2>
-            <div>
-                <label for="name">Время начала</label>
-                <VueTimepicker v-model="schedule.startTime" :format="format" :minute-interval="15"></VueTimepicker>
+            <div v-if="isDefault">
+                <label for="weekday">День недели</label>
+                <p id="weekday">{{ schedule.weekday }}</p>
             </div>
             <div>
-                <label for="name">Время окончания</label>
-                <VueTimepicker v-model="schedule.endTime" :format="format" :minute-interval="15"></VueTimepicker>
+                <label for="start-time">Время начала</label>
+                <VueTimepicker id="start-time" v-model="schedule.startTime" :format="format"
+                               :minute-interval="15"></VueTimepicker>
+            </div>
+            <div>
+                <label for="end-time">Время окончания</label>
+                <VueTimepicker id="end-time" v-model="schedule.endTime" :format="format"
+                               :minute-interval="15"></VueTimepicker>
             </div>
             <div v-if="!isDefault">
                 <label for="date">Дата</label>
-                <VueDatePicker v-model="schedule.date" auto-apply
+                <VueDatePicker id="date" v-model="schedule.date" auto-apply
                                :enable-time-picker="false"></VueDatePicker>
             </div>
             <div class="modal-buttons">
@@ -25,6 +31,7 @@
 
 <script>
 import VueTimepicker from 'vue3-timepicker';
+
 export default {
     components: {
         VueTimepicker
@@ -54,6 +61,7 @@ export default {
                 date: this.editingSchedule.date,
                 startTime: this.editingSchedule.startTime,
                 endTime: this.editingSchedule.endTime,
+                weekday: this.editingSchedule.weekday,
             };
         } else {
             this.schedule = {

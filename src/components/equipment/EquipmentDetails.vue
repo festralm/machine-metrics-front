@@ -194,6 +194,36 @@
                                           @close="showOrCloseModal(false)"
                                           @save="createEquipmentSchedule"></EquipmentScheduleCreateModal>
         </div>
+        <div class="schedule-expressions-list">
+            <p>Список расписаний</p>
+            <ul>
+                <div v-if="equipmentScheduleList && equipmentScheduleList.length > 0">
+                    <li v-for="schedule in equipmentScheduleList" :key="schedule.id">
+                        <div class="info-group">
+                            <label for="startTime">Время начала</label>
+                            <span id="startTime">{{ schedule.startTime }}</span>
+                        </div>
+                        <div class="info-group">
+                            <label for="endTime">Время окончания</label>
+                            <span id="endTime">{{ schedule.endTime }}</span>
+                        </div>
+                        <div class="info-group">
+                            <label for="date">Дата</label>
+                            <span id="date">{{ formatDate(schedule.date) }}</span>
+                        </div>
+                        <button @click="showOrCloseScheduleModal(true, schedule.id)">Редактировать</button>
+                        <button v-if="canDelete()" @click="deleteSchedule(schedule.id)">Удалить</button>
+                    </li>
+                </div>
+                <div v-else>
+                    <p>Нет доступных расписаний</p>
+                </div>
+            </ul>
+            <button v-if="canEditInfo()" @click="showOrCloseScheduleModal(true)">Задать график работы</button>
+            <ScheduleCreateModal v-if="showScheduleModal" :editingSchedule="editingSchedule" :isDefault="false"
+                                 @close="showOrCloseScheduleModal(false)"
+                                 @save="createSchedule"></ScheduleCreateModal>
+        </div>
         <div v-if="canDelete() || canUpdate()" class="button-group">
             <router-link v-if="canUpdate()" class="edit-button"
                          :to="{name: 'EquipmentEdit', params: {id: equipment.id}}">
@@ -208,13 +238,16 @@
 import EquipmentDataChart from '@/components/chart/EquipmentDataChart.vue'
 import EquipmentScheduleCreateModal from "@/components/equipment/EquipmentScheduleCreateModal.vue";
 import {mapActions, mapGetters} from 'vuex'
+import ScheduleCreateModal from "@/components/schedule/ScheduleCreateModal.vue";
 
 export default {
     name: "EquipmentDetails",
-    components: {EquipmentScheduleCreateModal, EquipmentDataChart},
+    components: {ScheduleCreateModal, EquipmentScheduleCreateModal, EquipmentDataChart},
     data() {
         return {
             showModal: false,
+            showScheduleModal: false,
+            editingSchedule: {},
         }
     },
     computed: {
@@ -223,6 +256,9 @@ export default {
         },
         equipmentSchedule() {
             return this.getCurrentEquipmentSchedule()
+        },
+        equipmentScheduleList() {
+            return this.getEquipmentScheduleList()(this.$route.params.id)
         },
         role() {
             return this.getRole();
@@ -235,9 +271,12 @@ export default {
         const equipmentId = this.$route.params.id;
         await this.fetchEquipmentById(equipmentId);
         await this.fetchEquipmentScheduleById(equipmentId);
+        await this.fetchByEquipmentId(equipmentId);
         await this.fetchEquipmentPhoto({id: equipmentId, path: this.equipment.photoPath});
     },
     methods: {
+        ...mapActions('schedule', ['fetchByEquipmentId', 'deleteSchedule', 'saveSchedule']),
+        ...mapGetters('schedule', ['getEquipmentScheduleList']),
         ...mapActions('equipment', ['fetchEquipmentById', 'deleteEquipment']),
         ...mapGetters('equipment', ['getCurrentEquipment']),
         ...mapActions('equipmentSchedule', ['fetchEquipmentScheduleById', 'saveEquipmentSchedule']),
@@ -258,7 +297,6 @@ export default {
             this.$router.push({name: 'EquipmentList'});
         },
         async createEquipmentSchedule(equipmentSchedule) {
-            console.log(this.$route.params.id)
             equipmentSchedule.id = this.$route.params.id
             if (!equipmentSchedule.dataServiceId) {
                 equipmentSchedule.dataServiceId = null
@@ -274,6 +312,17 @@ export default {
         },
         showOrCloseModal(show) {
             this.showModal = show
+        },
+        showOrCloseScheduleModal(show, id) {
+            this.showScheduleModal = show
+            this.editingSchedule = this.equipmentScheduleList.filter(x => x.id === id)[0]
+        },
+        async createSchedule(scheduleData) {
+            scheduleData.equipmentId = this.$route.params.id
+            const response = await this.saveSchedule(scheduleData)
+            if (response.ok) {
+                this.showOrCloseScheduleModal(false)
+            }
         },
         canUpdate() {
             return this.role === 'ADMIN' || this.role === 'MODERATOR'

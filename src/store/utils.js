@@ -10,6 +10,9 @@ export async function fetchWithResponseCheck(url, init, throwException) {
     } else if (!throwException && response.status === 403) {
         window.location = "/forbidden"
     } else if (!throwException && response.status === 404) {
+        console.log(404)
+        console.log(url)
+        console.log(init)
         window.location = "/not-found"
     } else if (!response.ok) {
         throw response;
