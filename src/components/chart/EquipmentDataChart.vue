@@ -16,7 +16,9 @@
                     <span class="up-hours">{{ this.equipmentStatistics.upHours }} часов вкл</span> /
                     <span class="down-hours">{{ this.equipmentStatistics.downHours }} часов выкл</span>
                 </div>
-                <div class="percent">{{ this.equipmentStatistics.upPercent.toFixed(2) }}% вкл</div>
+                <div v-if="typeof equipmentStatistics.upPercent == 'number'" class="percent">
+                    {{ this.equipmentStatistics.upPercent.toFixed(2) }}% вкл
+                </div>
             </div>
             <Line v-if="lineData" :data="lineData" :options="options"/>
         </div>
@@ -26,14 +28,15 @@
 <script>
 import {
     CategoryScale,
-    Decimation,
     Chart as ChartJS,
+    Decimation,
     Legend,
     LinearScale,
     LineElement,
     PointElement,
+    TimeScale,
     Title,
-    Tooltip, TimeScale,
+    Tooltip,
 } from 'chart.js'
 import {Line} from 'vue-chartjs'
 import {mapActions, mapGetters} from 'vuex'

@@ -14,7 +14,7 @@ const equipmentSchedule = {
     actions: {
         async fetchEquipmentScheduleById({commit}, id) {
             try {
-                const response = await fetchWithResponseCheck(`${API_URL}/equipment-info/${id}`, {}, true)
+                const response = await fetchWithResponseCheck(`${API_URL}/equipment-schedule/${id}`, {}, true)
                 var equipmentSchedule
                 equipmentSchedule = await response.json()
             } catch (error) {
@@ -30,7 +30,7 @@ const equipmentSchedule = {
             try {
                 let response
                 let updatedEquipmentSchedule
-                response = await fetchWithResponseCheck(`${API_URL}/equipment-info`, {
+                response = await fetchWithResponseCheck(`${API_URL}/equipment-schedule`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
