@@ -4,33 +4,56 @@ const API_URL = process.env.VUE_APP_API_URL
 const equipment = {
     namespaced: true,
     state: {
-        equipmentList: [],
+        equipmentPage: {},
+        equipmentSearchList: {},
         currentEquipment: null,
     },
     mutations: {
-        setEquipmentList(state, equipmentList) {
-            state.equipmentList = equipmentList
+        setEquipmentPage(state, equipmentPage) {
+            state.equipmentPage = equipmentPage
+        },
+        setEquipmentSearchList(state, equipmentSearchList) {
+            state.equipmentSearchList = equipmentSearchList
         },
         setCurrentEquipment(state, equipment) {
             state.currentEquipment = equipment
         },
         removeEquipmentFromList(state, equipmentId) {
-            state.equipmentList = state.equipmentList.filter(equipment => equipment.id !== equipmentId)
+            state.equipmentPage.content = state.equipmentPage.content.filter(equipment => equipment.id !== equipmentId)
+            state.equipmentPage.totalElements = state.equipmentPage.totalElements - 1
         },
         replaceEquipmentInList(state, data) {
-            const index = state.equipmentList.findIndex(item => item.id === data.id);
+            const index = state.equipmentPage.content.findIndex(item => item.id === data.id);
 
             if (index !== -1) {
-                state.equipmentList.splice(index, 1, data.equipment);
+                state.equipmentPage.content.splice(index, 1, data.equipment);
             }
         },
     },
     actions: {
-        async fetchEquipmentList({commit}) {
+        async fetchEquipmentPage({commit}, data) {
             try {
-                const response = await fetchWithResponseCheck(`${API_URL}/equipment`)
-                const equipmentList = await response.json()
-                commit('setEquipmentList', equipmentList)
+                const response = await fetchWithResponseCheck(
+                    `${API_URL}/equipment` +
+                    `?page=${data.page - 1}` +
+                    `&size=${data.size}`
+                )
+                const equipmentPage = await response.json()
+                commit('setEquipmentPage', equipmentPage)
+            } catch (error) {
+                console.log(error)
+            }
+        },
+        async searchEquipmentPage({commit}, data) {
+            try {
+                const response = await fetchWithResponseCheck(
+                    `${API_URL}/equipment/search` +
+                    `?name=${data.name}` +
+                    `&page=${data.page - 1}` +
+                    `&size=${data.size}`
+                )
+                const equipmentSearchList = await response.json()
+                commit('setEquipmentSearchList', equipmentSearchList)
             } catch (error) {
                 console.log(error)
             }
@@ -69,7 +92,13 @@ const equipment = {
                         body: JSON.stringify(equipmentData)
                     })
                     updatedEquipment = await response.json()
-                    commit('setEquipmentList', [...state.equipmentList, updatedEquipment])
+                    let equipmentPage = state.equipmentPage;
+                    let totalElements = equipmentPage.totalElements;
+                    equipmentPage.totalElements = totalElements ? totalElements + 1 : totalElements
+                    console.log(equipmentPage)
+                    let content = equipmentPage.content;
+                    equipmentPage.content = content ? [...content, updatedEquipment] : [updatedEquipment]
+                    commit('setEquipmentPage', equipmentPage)
                 }
 
                 commit('setCurrentEquipment', updatedEquipment);
@@ -99,7 +128,8 @@ const equipment = {
         }
     },
     getters: {
-        getEquipmentList: state => state.equipmentList,
+        getEquipmentPage: state => state.equipmentPage,
+        getEquipmentSearchList: state => state.equipmentSearchList,
         getCurrentEquipment: state => state.currentEquipment
     }
 }
