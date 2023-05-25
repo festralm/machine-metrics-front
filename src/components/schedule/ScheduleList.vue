@@ -2,8 +2,12 @@
     <div class="schedule-expressions-list">
         <h1>Список расписаний</h1>
         <ul>
-            <div v-if="scheduleList.length > 0 || defaultSchedule !== null">
-                <li v-if="defaultSchedule">
+            <div v-if="scheduleList.length > 0 || defaultSchedules.length > 0">
+                <li v-for="defaultSchedule in defaultSchedules" :key="defaultSchedule.id">
+                    <div class="info-group">
+                        <label for="startTime">День недели</label>
+                        <span id="startTime">{{ defaultSchedule.weekday }}</span>
+                    </div>
                     <div class="info-group">
                         <label for="startTime">Время начала</label>
                         <span id="startTime">{{ defaultSchedule.startTime }}</span>
@@ -16,6 +20,11 @@
                 </li>
                 <li v-for="schedule in scheduleList" :key="schedule.id">
                     <div class="info-group">
+                        <router-link :to="{ name: 'EquipmentDetails', params: { id: schedule.equipmentId }}">
+                            Оборудование #{{ schedule.equipmentId }}
+                        </router-link>
+                    </div>
+                    <div class="info-group">
                         <label for="startTime">Время начала</label>
                         <span id="startTime">{{ schedule.startTime }}</span>
                     </div>
@@ -27,7 +36,6 @@
                         <label for="date">Дата</label>
                         <span id="date">{{ formatDate(schedule.date) }}</span>
                     </div>
-                    <button @click="showOrCloseModal(true, schedule.id)">Редактировать</button>
                     <button v-if="canDelete()" @click="deleteSchedule(schedule.id)">Удалить</button>
                 </li>
             </div>
@@ -36,7 +44,7 @@
             </div>
         </ul>
         <button @click="showOrCloseModal(true)">Добавить расписание</button>
-        <ScheduleCreateModal v-if="showModal" :editingSchedule="editingSchedule" :isDefault="isDefault"
+        <ScheduleCreateModal v-if="showModal" :editingSchedule="editingSchedule" :isDefault="true"
                              @close="showOrCloseModal(false)"
                              @save="createSchedule"></ScheduleCreateModal>
     </div>
@@ -55,16 +63,14 @@ export default {
         return {
             showModal: false,
             editingSchedule: null,
-            isDefault: false,
         }
     },
     computed: {
         scheduleList() {
-            return this.getScheduleList().filter(x => x.date != null);
+            return this.getScheduleList();
         },
-        defaultSchedule() {
-            let defaultScheduleList = this.getScheduleList().filter(x => x.date == null);
-            return defaultScheduleList.length > 0 ? defaultScheduleList[0] : null;
+        defaultSchedules() {
+            return this.getDefaultScheduleList();
         },
         role() {
             return this.getRole();
@@ -72,30 +78,22 @@ export default {
     },
     created() {
         this.fetchScheduleList();
+        this.fetchDefaultScheduleList();
     },
     methods: {
-        ...mapActions('schedule', ['fetchScheduleList', 'deleteSchedule', 'saveSchedule']),
-        ...mapGetters('schedule', ['getScheduleList']),
+        ...mapActions('schedule', ['fetchDefaultScheduleList', 'fetchScheduleList', 'deleteSchedule', 'saveDefaultSchedule']),
+        ...mapGetters('schedule', ['getScheduleList', 'getDefaultScheduleList']),
         ...mapGetters('auth', ['getRole']),
         async createSchedule(scheduleData) {
-            const response = await this.saveSchedule(scheduleData)
+            const response = await this.saveDefaultSchedule(scheduleData)
             if (response.ok) {
                 this.showOrCloseModal(false)
                 this.$router.push({name: 'ScheduleList'})
             }
         },
         showOrCloseModal(show, id) {
-            this.isDefault = false
             this.showModal = show
-            if (id) {
-                this.editingSchedule = this.scheduleList.filter(x => x.id === id)[0]
-                if (!this.editingSchedule && this.defaultSchedule.id === id) {
-                    this.editingSchedule = this.defaultSchedule
-                    this.isDefault = true
-                }
-            } else {
-                this.editingSchedule = null
-            }
+            this.editingSchedule = this.defaultSchedules.filter(x => x.id === id)[0]
         },
         canDelete() {
             return this.role === 'ADMIN'

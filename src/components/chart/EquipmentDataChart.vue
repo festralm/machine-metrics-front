@@ -6,10 +6,8 @@
                 {{ this.equipmentStatistics.schedules }}
             </div>
             <div class="date-picker">
-                <VueDatePicker v-model="startPeriod" @update:model-value="saveStartDate" auto-apply
-                               :enable-time-picker="false"></VueDatePicker>
-                <VueDatePicker v-model="endPeriod" @update:model-value="saveEndDate" auto-apply
-                               :enable-time-picker="false"></VueDatePicker>
+                <VueDatePicker v-model="startPeriod" @update:model-value="saveStartDate" auto-apply></VueDatePicker>
+                <VueDatePicker v-model="endPeriod" @update:model-value="saveEndDate" auto-apply></VueDatePicker>
             </div>
             <div class="up-down-percent">
                 <div class="up-down-hours">
