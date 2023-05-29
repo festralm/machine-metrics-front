@@ -3,10 +3,13 @@
         <h1 class="title">Создать оборудование</h1>
         <form @submit.prevent="createEquipment">
             <div class="form-group">
-                <label for="photo">Добавить фото</label>
                 <img class="photo" :src="photoUrl" alt="Equipment Photo" v-if="photoUrl">
-                <input id="photo" type="file" ref="photoInput" accept="image/*" @change="onPhotoChange()"/>
-                <input id="photo-delete" type="button" @click="clearPhoto()" value="Удалить фото"/>
+                <label for="photo" class="file-input">Загрузить фото</label>
+                <input id="photo" type="file" ref="photoInput" accept="image/*"  @change="onPhotoChange()"/>
+                <input id="photo-delete" type="button" class="delete-input" @click="clearPhoto()" value="Удалить фото"/>
+                <PhotoCropModal v-if="showModal" :photoUrl="croppingPhoto"
+                                @close="showOrCloseModal(false)"
+                                @save="showPhoto"></PhotoCropModal>
             </div>
             <div class="form-group">
                 <label for="name">Наименование оборудования*</label>
@@ -224,9 +227,11 @@
 
 <script>
 import {mapActions, mapGetters} from 'vuex'
+import PhotoCropModal from "@/components/equipment/PhotoCropModal.vue";
 
 export default {
     name: "EquipmentCreate",
+    components: {PhotoCropModal},
     data() {
         return {
             photo: null,
@@ -269,6 +274,8 @@ export default {
             responsiblePerson: null,
             status: null,
             photoPath: null,
+            showModal: false,
+            croppingPhoto: null,
         };
     },
     computed: {
@@ -288,12 +295,15 @@ export default {
             return this.getStatusList();
         },
     },
-    created() {
-        this.fetchPurposeList();
-        this.fetchUsageTypeList();
-        this.fetchCountryList();
-        this.fetchUnitList();
-        this.fetchStatusList();
+    async created() {
+        await this.fetchPurposeList();
+        await this.fetchUsageTypeList();
+        await this.fetchCountryList();
+        await this.fetchUnitList();
+        await this.fetchStatusList();
+        await this.fetchDefaultPhoto();
+        this.photoUrl = await this.getDefaultPhoto()
+        this.showOrCloseModal(false)
     },
     methods: {
         ...mapActions('equipment', ['saveEquipment']),
@@ -307,7 +317,8 @@ export default {
         ...mapGetters('unit', ['getUnitList']),
         ...mapActions('status', ['fetchStatusList']),
         ...mapGetters('status', ['getStatusList']),
-        ...mapActions('photo', ['uploadPhoto']),
+        ...mapActions('photo', ['uploadPhoto', 'fetchDefaultPhoto']),
+        ...mapGetters('photo', ['getDefaultPhoto']),
         async createEquipment() {
             if (this.photo) {
                 try {
@@ -379,51 +390,104 @@ export default {
 
                 this.photo = formData
                 this.photoPath = photoFile.name
-                this.photoUrl = URL.createObjectURL(photoFile)
+                this.croppingPhoto = URL.createObjectURL(photoFile)
+
+                this.showOrCloseModal(true)
             }
         },
         clearPhoto() {
             this.$refs.photoInput.value = null
             this.photoPath = null
-            this.photoUrl = null
+            this.photoUrl = this.getDefaultPhoto()
+            this.croppingPhoto = null
         },
+        showOrCloseModal(show) {
+            this.showModal = show
+        },
+        showPhoto(blob) {
+            console.log(this.photo)
+            const formData = new FormData();
+            formData.append('name', this.photoPath);
+            formData.append('photo', blob);
+            this.photo = formData
+            console.log(this.photo)
+            this.photoUrl = URL.createObjectURL(blob)
+
+            this.showOrCloseModal(false)
+        }
     },
 }
 </script>
 
 <style scoped>
 .equipment-create {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
+    width: 85%;
+    background-color: white;
+    flex: 1;
+}
+
+input[type="file"] {
+    display: none;
 }
 
 .title {
-    font-size: 32px;
-    margin-bottom: 20px;
-    text-align: center;
-    color: #3f51b5;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.15);
+    margin: 0;
+    padding: 20px 0 20px 0;
+    color: white;
 }
+
+form {
+    margin: 50px;
+}
+
+.photo {
+    width: 200px;
+}
+
+.file-input {
+    background-color: rgba(0, 85, 144, 0.69);
+    font-size: 15px;
+    width: 150px;
+    height: 30px;
+    color: white;
+    font-weight: bold;
+    border-color: white;
+    border-radius: 5px;
+    border-width: 1px;
+    cursor: pointer;
+}
+
+.file-input:hover {
+    border-color: rgba(255, 255, 255, 0.27);
+}
+
+.delete-input {
+    background-color: rgba(144, 0, 0, 0.69);
+    font-size: 15px;
+    width: 150px;
+    height: 30px;
+    color: white;
+    font-weight: bold;
+    border-color: white;
+    border-radius: 5px;
+    border-width: 1px;
+    cursor: pointer;
+}
+
+.delete-input:hover {
+    border-color: rgba(255, 255, 255, 0.27);
+}
+
+
+
 
 .form-group {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     margin-bottom: 20px;
-}
-
-label {
-    font-size: 18px;
-    margin-right: 10px;
-    color: #444;
-}
-
-input {
-    flex-grow: 1;
-    font-size: 16px;
-    padding: 10px;
-    border: none;
-    border-radius: 5px;
 }
 
 .save-button {
@@ -438,10 +502,5 @@ input {
 
 .save-button:hover {
     background-color: #2c3e50;
-}
-
-.photo {
-    width: 400px;
-    height: 400px;
 }
 </style>

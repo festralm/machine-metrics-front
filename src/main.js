@@ -6,6 +6,8 @@ import '@vuepic/vue-datepicker/dist/main.css'
 import store from "./store";
 import Keycloak from "keycloak-js";
 import 'vue3-timepicker/dist/VueTimepicker.css'
+import VueCropper from 'vue-cropperjs';
+import 'cropperjs/dist/cropper.css';
 
 const initOptions = {
     realm: 'master',
@@ -33,7 +35,8 @@ function instantiateVueApp() {
     app
         .use(store)
         .use(router)
-        .component('VueDatePicker', VueDatePicker);
+        .component('VueDatePicker', VueDatePicker)
+        .component('VueCropper', VueCropper);
     app.mount('#app');
 }
 

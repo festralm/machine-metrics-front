@@ -1,49 +1,31 @@
 <template>
     <div class="equipment-item" @click="goToDetails">
-        <img class="photo" :src="photoUrl" alt="Equipment Photo" v-if="photoUrl">
-        <div>
-            <div class="info-group">
-                <label>Инвентарный номер:</label>
-                <span>{{ equipment.inventoryNumber }}</span>
+        <div class="block">
+            <div class="block-item">
+                <div class="left-block">
+                    <div class="left-block-item" >
+                        <img class="photo" :src="photoUrl" alt="Equipment Photo" v-if="photoUrl" @click.stop="">
+                    </div>
+                    <div class="left-block-item">
+                        <button class="delete-button" v-if="canDelete()" @click.stop="deleteAndReload(equipment.id)">
+                            Удалить
+                        </button>
+                    </div>
+                </div>
             </div>
-            <div class="info-group">
-                <label>Наименование оборудования:</label>
-                <span>{{ equipment.name }}</span>
-            </div>
-            <div class="info-group">
-                <label>Место установки:</label>
-                <span>{{ equipment.installationLocation }}</span>
-            </div>
-            <div class="info-group">
-                <label>Стоимость:</label>
-                <span>{{ equipment.cost }}</span>
-            </div>
-            <div class="info-group">
-                <label>Источник приобретения:</label>
-                <span>{{ equipment.acquisitionSource }}</span>
-            </div>
-            <div class="info-group">
-                <label>Подразделение:</label>
-                <span>{{ equipment.unit }}</span>
-            </div>
-            <div class="info-group">
-                <label>Лицо, ответственное за функционирование оборудования:</label>
-                <span>{{ equipment.responsiblePerson }}</span>
-            </div>
-            <div class="info-group">
-                <label>Статус оборудования:</label>
-                <span>{{ equipment.status }}</span>
-            </div>
-            <div class="info-group">
-                <label>Дата поступления:</label>
-                <span>{{ equipment.deliveryDate }}</span>
-            </div>
-            <div class="info-group">
-                <label>Дата последней операции:</label>
-                <span>{{ equipment.lastOperationDate }}</span>
+            <div class="block-item">
+                <table class="equipment-table">
+                    <tr class="name">
+                        <td class="label">Наименование оборудования:</td>
+                        <td class="value">{{ equipment.name }}</td>
+                    </tr>
+                    <tr v-for="info in equipmentInfo" :key="info.label">
+                        <td class="label">{{ info.label }}</td>
+                        <td class="value">{{ info.value }}</td>
+                    </tr>
+                </table>
             </div>
         </div>
-        <button v-if="canDelete()" @click.stop="deleteEquipment(equipment.id)">Удалить</button>
     </div>
 </template>
 
@@ -67,10 +49,24 @@ export default {
         },
         photoUrl() {
             return this.getEquipmentPhoto()(this.equipment.id);
-        },
+        }, equipmentInfo() {
+            return [
+                {label: 'Инвентарный номер:', value: this.equipment.inventoryNumber},
+                {label: 'Место установки:', value: this.equipment.installationLocation},
+                {label: 'Стоимость:', value: this.equipment.cost},
+                {label: 'Источник приобретения:', value: this.equipment.acquisitionSource},
+                {label: 'Подразделение:', value: this.equipment.unit},
+                {
+                    label: 'Лицо, ответственное за функционирование оборудования:',
+                    value: this.equipment.responsiblePerson
+                },
+                {label: 'Статус оборудования:', value: this.equipment.status},
+                {label: 'Дата поступления:', value: this.formatDate(this.equipment.deliveryDate)},
+                {label: 'Дата последней операции:', value: this.formatDate(this.equipment.lastOperationDate)}
+            ];
+        }
     },
     methods: {
-        ...mapActions('equipment', ['deleteEquipment']),
         ...mapGetters('auth', ['getRole']),
         ...mapActions('photo', ['fetchEquipmentPhoto']),
         ...mapGetters('photo', ['getEquipmentPhoto']),
@@ -80,82 +76,109 @@ export default {
         canDelete() {
             return this.role === 'ADMIN'
         },
+        deleteAndReload(id) {
+            this.$emit('delete', id)
+        },
+        formatDate(dateString) {
+            if (!dateString) return ''
+            const date = new Date(dateString)
+            const day = date.getDate().toString().padStart(2, '0')
+            const month = (date.getMonth() + 1).toString().padStart(2, '0')
+            const year = date.getFullYear()
+            return `${day}.${month}.${year}`
+        },
     },
 }
 </script>
 
 <style scoped>
-.equipment-item {
+
+.block {
     display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    margin: 20px 0;
-    padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    cursor: pointer;
 }
 
-.equipment-item:hover {
-    background-color: #f5f5f5;
+.block-item:first-child {
+    align-self: center;
+    flex-grow: 1;
 }
 
-.equipment-item h2 {
-    text-align: left;
-    font-size: 1.5em;
-    margin-bottom: 10px;
-    color: #333;
-    font-weight: bold;
+.block-item:last-child {
+    width: 700px;
 }
 
-.info-group {
+.left-block {
     display: flex;
-    flex-direction: row;
-    align-items: center;
-    margin-bottom: 5px;
-}
-
-.info-group label {
-    font-size: 18px;
-    margin-right: 10px;
-    color: #444;
-}
-
-.info-group span {
-    font-size: 16px;
-    padding: 10px;
-    border: none;
-    border-radius: 5px;
-    background-color: #f5f5f5;
-    color: #333;
-}
-
-.equipment-item button {
-    background-color: #f44336;
-    color: white;
-    padding: 8px 16px;
-    font-size: 1em;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.equipment-item button:hover {
-    background-color: #b71c1c;
-}
-
-.equipment-item button:focus {
-    outline: none;
-}
-
-.equipment-item button:active {
-    background-color: #ba000d;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .photo {
-    width: 200px;
-    height: 200px;
+    height: 220px;
+    cursor: auto;
+}
+
+.equipment-item {
+    background-color: rgba(0, 0, 0, 0.02);
+    padding: 10px;
+    margin: 50px 20px 30px 20px;
+    cursor: pointer;
+}
+
+.equipment-item:first-child {
+    margin-top: 30px;;
+}
+.equipment-item:hover {
+
+    background-color: rgba(0, 0, 0, 0.04);
+}
+
+.equipment-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.equipment-table tr {
+    font-size: 13px;
+    border-bottom: 1px solid #ccc;
+}
+
+.equipment-table .name {
+    font-size: 15px;
+    border-bottom: 2px solid #ccc;
+}
+
+.equipment-table td {
+    padding: 5px;
+    width: auto;
+}
+
+.equipment-table .label {
+    font-weight: bold;
+    text-align: right;
+    padding-right: 30px;
+    width: 350px;
+}
+
+.equipment-table .value {
+    padding-left: 0;
+    text-align: left;
+    width: 250px;
+}
+
+.delete-button {
+    background-color: rgba(0, 85, 144, 0.69);
+    font-size: 15px;
+    width: 80px;
+    height: 35px;
+    color: white;
+    font-weight: bold;
+    border-color: white;
+    border-radius: 5px;
+    border-width: 1px;
+    cursor: pointer;
+}
+
+.delete-button:hover {
+    border-color: rgba(255, 255, 255, 0.27);
 }
 </style>
