@@ -1,6 +1,9 @@
 <template>
     <div class="schedule-expressions-list">
-        <h1>Список расписаний</h1>
+        <h1 class="title">Список расписаний</h1>
+        <div class="create-div">
+        <button class="create-button" @click="showOrCloseModal(true)">Добавить расписание</button>
+        </div>
         <ul>
             <div v-if="scheduleList.length > 0 || defaultSchedules.length > 0">
                 <li v-for="defaultSchedule in defaultSchedules" :key="defaultSchedule.id">
@@ -43,7 +46,6 @@
                 <p>Нет доступных расписаний</p>
             </div>
         </ul>
-        <button @click="showOrCloseModal(true)">Добавить расписание</button>
         <ScheduleCreateModal v-if="showModal" :editingSchedule="editingSchedule" :isDefault="true"
                              @close="showOrCloseModal(false)"
                              @save="createSchedule"></ScheduleCreateModal>

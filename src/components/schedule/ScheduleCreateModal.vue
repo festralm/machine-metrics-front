@@ -29,9 +29,11 @@
                     </td>
                 </tr>
                 <tr class="name">
-                    <td class="label"><button class="button" @click="saveSchedule">Сохранить</button></td>
+                    <td class="label">
+                        <button class="button" @click="saveSchedule">Сохранить</button>
+                    </td>
                     <td class="value">
-                    <button class="button delete-button" @click="$emit('close')">Отмена</button>
+                        <button class="button delete-button" @click="$emit('close')">Отмена</button>
                     </td>
                 </tr>
             </table>

@@ -1,23 +1,29 @@
 <template>
     <div class="modal">
         <div class="modal-content">
-            <h2>Добавить cron-выражение</h2>
-            <div>
-                <label for="name">Выражение:</label>
-                <input type="text" v-model="cron.expression" id="expression">
-            </div>
-            <div>
-                <label for="name">Порядок:</label>
-                <input type="text" v-model="cron.order" id="order">
-            </div>
-            <div>
-                <label for="name">Название:</label>
-                <input type="text" v-model="cron.name" id="name">
-            </div>
-            <div class="modal-buttons">
-                <button @click="saveCron">Сохранить</button>
-                <button @click="$emit('close')">Отмена</button>
-            </div>
+            <p>Добавить cron-выражение</p>
+            <table class="equipment-table">
+                <tr class="name">
+                    <td class="label"><label for="name">Выражение:</label></td>
+                    <td class="value"><input type="text" v-model="cron.expression" id="expression"></td>
+                </tr>
+                <tr class="name">
+                    <td class="label"><label for="name">Порядок:</label></td>
+                    <td class="value"><input type="text" v-model="cron.order" id="order"></td>
+                </tr>
+                <tr class="name">
+                    <td class="label"><label for="name">Название:</label></td>
+                    <td class="value"><input type="text" v-model="cron.name" id="name"></td>
+                </tr>
+                <tr class="name">
+                    <td class="label">
+                        <button class="button" @click="saveCron">Сохранить</button>
+                    </td>
+                    <td class="value">
+                        <button class="button delete-button" @click="$emit('close')">Отмена</button>
+                    </td>
+                </tr>
+            </table>
         </div>
     </div>
 </template>
@@ -79,32 +85,54 @@ export default {
 }
 
 .modal-content {
-    background-color: #fff;
-    padding: 2rem;
+    background-color: #fefefe;
+    padding: 20px;
     border-radius: 0.5rem;
 }
 
-.modal-buttons {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 1rem;
+p {
+    font-size: 20px;
+    padding-top: 0;
+    margin-top: 10px;
 }
 
-button {
-    padding: 0.5rem 1rem;
-    border: none;
-    border-radius: 0.5rem;
-    background-color: #4caf50;
-    color: #fff;
+.equipment-table input {
+    width: 150px;
+    height: 20px;
+    border-radius: 0;
+    border-width: 1px;
+    outline: none;
+    font-size: 15px;
+}
+
+.equipment-table tr {
+    font-size: 15px;
+    border-bottom: 1px solid #ccc;
+}
+
+.equipment-table td {
+    width: 150px;
+}
+
+.button {
+    background-color: rgba(0, 85, 144, 0.69);
+    font-size: 15px;
+    width: 120px;
+    height: 30px;
+    color: white;
+    font-weight: bold;
+    border-color: white;
+    border-radius: 5px;
+    border-width: 1px;
     cursor: pointer;
 }
 
-input[type="text"] {
-    padding: 0.5rem;
-    border-radius: 0.5rem;
-    border: 1px solid #ccc;
-    width: 100%;
-    margin-bottom: 1rem;
+.button:hover {
+    border-color: rgba(255, 255, 255, 0.27);
 }
 
+.delete-button {
+    margin-left: 10px;
+    background-color: rgba(144, 0, 0, 0.69);
+}
 </style>
