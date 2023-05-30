@@ -1,17 +1,19 @@
 <template>
   <div class="user-list">
-    <h1 class="title">Пользователи</h1>
-    <div v-if="userList && userList.length > 0">
-      <div v-for="user in userList" :key="user.id">
-        <user-item :user="user"/>
+      <h1 class="title">Пользователи</h1>
+      <div class="create-div">
+          <router-link :to="{ name: 'UserCreate' }">
+              <button class="create-button">Создать пользователя</button>
+          </router-link>
       </div>
-    </div>
-    <div v-else>
-      <p class="no-user">Нет доступных пользователей</p>
-    </div>
-    <router-link :to="{ name: 'UserCreate' }">
-      <button class="create-button">Создать пользователя</button>
-    </router-link>
+      <div v-if="userList && userList.length > 0">
+          <div v-for="user in userList" :key="user.id">
+              <user-item :user="user"/>
+          </div>
+      </div>
+      <div v-else>
+          <p class="no-user">Нет доступных пользователей</p>
+      </div>
   </div>
 </template>
 
@@ -43,47 +45,44 @@ export default {
 
 <style scoped>
 .user-list {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 20px;
-  background-color: #f8f8f8;
-  border-radius: 5px;
+    width: 85%;
+    background-color: white;
+    flex: 1;
 }
 
 .title {
-  font-size: 32px;
-  margin-bottom: 20px;
-  text-align: center;
-  color: #4a4a4a;
-  text-shadow: 1px 1px #eee;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.15);
+    margin: 0;
+    padding: 20px 0 20px 0;
+    color: white;
+}
+
+.create-div {
+    margin: 30px 20px 0 0;
+    display: flex;
+    justify-content: flex-end;
 }
 
 .no-user {
-  font-size: 24px;
-  margin-top: 20px;
-  text-align: center;
-  color: #666;
+    font-size: 30px;
 }
 
 .create-button {
-  font-size: 18px;
-  padding: 10px;
-  background-color: #2f2f3e;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  margin-top: 10px;
-  margin-right: 10px;
-  box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
-  transition: background-color 0.3s ease;
+    background-color: rgb(0, 85, 144);
+    font-size: 15px;
+    width: 200px;
+    height: 35px;
+    color: white;
+    font-weight: bold;
+    border-color: white;
+    border-radius: 5px;
+    border-width: 1px;
+    cursor: pointer;
 }
 
 .create-button:hover {
-  background-color: #0097a7;
+    border-color: rgba(255, 255, 255, 0.27);
 }
 
 

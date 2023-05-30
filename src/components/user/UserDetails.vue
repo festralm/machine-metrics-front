@@ -1,18 +1,21 @@
 <template>
     <div class="user-detail" v-if="user">
         <h1 class="title">{{ user.firstName }} {{ user.lastName }}</h1>
-        <div class="info-group">
-            <label for="surname">Email:</label>
-            <span id="surname">{{ user.username }}</span>
-        </div>
-        <div class="info-group">
-            <label for="role">Роль:</label>
-            <span id="role">{{ user.realmRoles[0] }}</span>
-        </div>
+        <table class="equipment-table">
+            <tr class="name">
+                <td class="label"><label for="surname">Email:</label></td>
+                <td class="value">{{ user.username }}</td>
+            </tr>
+            <tr class="name">
+                <td class="label"><label for="role">Роль:</label></td>
+                <td class="value">{{ user.realmRoles[0] }}</td>
+            </tr>
+        </table>
         <div class="button-group">
-            <router-link class="edit-button" :to="{name: 'UserEdit', params: {id: user.id}}">Редактировать
-            </router-link>
-            <button class="delete-button" @click="deleteCurrentUser()">Удалить</button>
+            <button class="edit-button cron-button"
+                    @click="goTo({name: 'UserEdit', params: {id: user.id}})">Редактировать
+            </button>
+            <button class="delete-button cron-button" @click="deleteCurrentUser()">Удалить</button>
         </div>
     </div>
 </template>
@@ -51,96 +54,77 @@ export default {
             await this.deleteUser(this.user.id);
             this.$router.push({name: 'UserList'});
         },
+        goTo(obj) {
+            this.$router.push(obj)
+        },
     },
 }
 </script>
 
 <style scoped>
 .user-detail {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
-    background-color: #fff;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-    border-radius: 5px;
+    width: 85%;
+    background-color: white;
+    flex: 1;
 }
 
 .title {
-    font-size: 32px;
-    margin-bottom: 20px;
-    text-align: center;
-    color: #3f51b5;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.15);
+    margin: 0;
+    padding: 20px 0 20px 0;
+    color: white;
 }
 
-.info-group {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    margin-bottom: 20px;
-    border-bottom: 1px solid #ddd;
+.equipment-table {
+    width: 100%;
+    border-collapse: collapse;
 }
 
-.info-group:last-of-type {
-    border-bottom: none;
+.equipment-table tr {
+    font-size: 13px;
+    border-bottom: 1px solid rgba(0, 85, 144, 0.69);
 }
 
-label {
-    font-size: 18px;
-    margin-right: 10px;
-    color: #444;
+.equipment-table td {
+    padding: 5px;
+    width: auto;
 }
 
-span {
-    font-size: 16px;
-    padding: 10px;
-    border: none;
+.equipment-table .label {
+    font-weight: bold;
+    text-align: right;
+    padding-right: 30px;
+    width: 350px;
+}
+
+.equipment-table .value {
+    padding-left: 0;
+    text-align: left;
+    width: 350px;
+}
+.cron-button {
+    background-color: rgba(0, 85, 144, 0.69);
+    font-size: 15px;
+    width: 150px;
+    height: 30px;
+    color: white;
+    font-weight: bold;
+    border: 1px solid white;
     border-radius: 5px;
-    background-color: #f5f5f5;
+    cursor: pointer;
 }
 
-.button-group {
-    display: flex;
-    justify-content: flex-end;
-    margin-top: 20px;
+.cron-button:hover {
+    border-color: rgba(255, 255, 255, 0.27);
 }
 
 .delete-button {
-    font-size: 16px;
-    background-color: #f44336;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    padding: 10px 20px;
-    cursor: pointer;
+    margin-left: 20px;
+    background-color: rgba(144, 0, 0, 0.69);
 }
 
-.delete-button:hover {
-    background-color: #d32f2f;
+.button-group {
+    margin-top: 20px;
 }
-
-.delete-button:focus {
-    outline: none;
-    box-shadow: 0 0 3px rgba(0, 0, 0, 0.3);
-}
-
-.edit-button {
-    font-size: 16px;
-    background-color: #2196f3;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    padding: 10px 20px;
-    cursor: pointer;
-    margin-right: 10px;
-}
-
-.edit-button:hover {
-    background-color: #1976d2;
-}
-
-.edit-button:focus {
-    outline: none;
-    box-shadow: 0 0 3px rgba(0, 0, 0, 0.3);
-}
-
 </style>

@@ -650,13 +650,7 @@ form {
     height: 20px;
     border-radius: 0;
     border-width: 1px;
-}
-
-.equipment-table input[type=text], .equipment-table input[type=number] {
     outline: none;
-}
-
-.equipment-table input[type=text], .equipment-table input[type=number] {
     font-size: 15px;
 }
 

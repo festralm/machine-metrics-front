@@ -2,29 +2,31 @@
     <div class="user-create">
         <h1 class="title">Создать пользователя</h1>
         <form @submit.prevent="createUser">
-            <div class="form-group">
-                <label for="firstName">Имя</label>
-                <input id="firstName" type="text" v-model="firstName" required/>
-            </div>
-            <div class="form-group">
-                <label for="lastName">Фамилия</label>
-                <input id="lastName" type="text" v-model="lastName" required/>
-            </div>
-            <div class="form-group">
-                <label for="email">Email</label>
-                <input id="email" type="email" v-model="email" required/>
-            </div>
-            <div class="form-group">
-                <label for="password">Пароль</label>
-                <input id="password" type="password" v-model="password" required/>
-            </div>
-            <div class="form-group">
-                <label for="role">Роль</label>
-                <select id="role" v-model="roleName">
-                    <option value=""></option>
-                    <option v-for="role in roles" :key="role.id" :value="role.name">{{ role.description }}</option>
-                </select>
-            </div>
+            <table class="equipment-table">
+                <tr class="name">
+                    <td class="label"><label for="firstName">Имя</label></td>
+                    <td class="value"><input id="firstName" type="text" v-model="firstName" required/></td>
+                </tr>
+                <tr class="inventory-number">
+                    <td class="label"><label for="lastName">Фамилия</label></td>
+                    <td class="value"><input id="lastName" type="text" v-model="lastName" required/></td>
+                </tr>
+                <tr class="inventory-number">
+                    <td class="label"><label for="email">Email</label></td>
+                    <td class="value"><input id="email" type="email" v-model="email" required/></td>
+                </tr>
+                <tr class="inventory-number">
+                    <td class="label"><label for="password">Пароль</label></td>
+                    <td class="value"><input id="password" type="password" v-model="password" required/></td>
+                </tr>
+                <tr class="inventory-number">
+                    <td class="label"><label for="role">Роль</label></td>
+                    <td class="value"><select id="role" v-model="roleName">
+                        <option value=""></option>
+                        <option v-for="role in roles" :key="role.id" :value="role.name">{{ role.description }}</option>
+                    </select></td>
+                </tr>
+            </table>
             <div class="form-group">
                 <button class="save-button" type="submit">Сохранить</button>
             </div>
@@ -78,50 +80,62 @@ export default {
 
 <style scoped>
 .user-create {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
+    width: 85%;
+    background-color: white;
+    flex: 1;
 }
 
 .title {
-    font-size: 32px;
-    margin-bottom: 20px;
-    text-align: center;
-    color: #3f51b5;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.15);
+    margin: 0;
+    padding: 20px 0 20px 0;
+    color: white;
 }
 
-.form-group {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    margin-bottom: 20px;
+form {
+    margin: 50px 150px 50px 150px;
 }
 
-label {
-    font-size: 18px;
-    margin-right: 10px;
-    color: #444;
+.equipment-table input[type=text], .equipment-table input[type=email], .equipment-table input[type=password], .equipment-table input[type=number], .equipment-table select {
+    width: 250px;
+    height: 20px;
+    border-radius: 0;
+    border-width: 1px;
+    outline: none;
+    font-size: 15px;
 }
 
-input {
-    flex-grow: 1;
-    font-size: 16px;
-    padding: 10px;
-    border: none;
-    border-radius: 5px;
+.equipment-table select {
+    margin-top: 1px;
+    width: 255px;
+    height: 23px;
+}
+
+.equipment-table tr {
+    font-size: 15px;
+    border-bottom: 1px solid #ccc;
+}
+
+.equipment-table td {
+    width: 300px;
 }
 
 .save-button {
-    background-color: #3f51b5;
+    background-color: rgb(0, 85, 144);
+    font-size: 15px;
+    width: 200px;
+    height: 35px;
     color: white;
-    font-size: 18px;
-    padding: 10px 20px;
-    border: none;
+    font-weight: bold;
+    border-color: white;
     border-radius: 5px;
+    border-width: 1px;
     cursor: pointer;
+    margin-top: 20px;
 }
 
 .save-button:hover {
-    background-color: #2c3e50;
+    border-color: rgba(255, 255, 255, 0.27);
 }
 </style>
