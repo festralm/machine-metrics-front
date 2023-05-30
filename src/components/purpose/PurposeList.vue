@@ -1,18 +1,18 @@
 <template>
     <div class="countries-list">
-        <h1>Список назначений</h1>
-        <ul>
-            <div v-if="purposeList.length > 0">
-                <li v-for="purpose in purposeList" :key="purpose.id">
-                    <span>{{ purpose.name }}</span>
-                    <button v-if="canDelete()" @click="deletePurpose(purpose.id)">Удалить</button>
-                </li>
+        <h1 class="title">Список назначений</h1>
+        <div class="create-div">
+            <button class="create-button" @click="showOrCloseModal(true)">Добавить назначение</button>
+        </div>
+        <div v-if="purposeList.length > 0">
+            <div class="equipment-item" v-for="purpose in purposeList" :key="purpose.id">
+                <span>{{ purpose.name }}</span>
+                <button class="delete-button" v-if="canDelete()" @click="deletePurpose(purpose.id)">Удалить</button>
             </div>
-            <div v-else>
-                <p>Нет доступных назначений</p>
-            </div>
-        </ul>
-        <button @click="showOrCloseModal(true)">Добавить назначение</button>
+        </div>
+        <div v-else>
+            <p class="no-equipment">Нет доступных назначений</p>
+        </div>
         <PurposeCreateModal v-if="showModal" @close="showOrCloseModal(false)"
                             @save="createPurpose"></PurposeCreateModal>
     </div>
@@ -70,25 +70,77 @@ export default {
 
 <style scoped>
 .countries-list {
-    margin-top: 2rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    width: 85%;
+    background-color: white;
+    flex: 1;
 }
 
-.countries-list ul {
-    list-style: none;
+.title {
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.15);
     margin: 0;
-    padding: 0;
+    padding: 20px 0 20px 0;
+    color: white;
 }
 
-.countries-list li {
-    margin: 0.5rem 0;
-    font-size: 1.2rem;
+.create-div {
+    margin: 30px 20px 0 0;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.create-button {
+    background-color: rgb(0, 85, 144);
+    font-size: 15px;
+    width: 200px;
+    height: 35px;
+    color: white;
     font-weight: bold;
+    border-color: white;
+    border-radius: 5px;
+    border-width: 1px;
+    cursor: pointer;
 }
 
-.countries-list button {
-    margin-left: 1rem;
+.create-button:hover {
+    border-color: rgba(255, 255, 255, 0.27);
+}
+.no-equipment {
+    font-size: 30px;
+}
+
+.equipment-item {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin: 20px 20px 20px 20px;
+    padding: 10px;
+    background-color: rgba(0, 0, 0, 0.04);
+}
+
+.equipment-item h2 {
+    font-size: 22px;
+    color: #333;
+    font-weight: bold;
+    margin: 10px 20px 10px 20px;
+}
+
+
+.delete-button {
+    background-color: rgba(144, 0, 0, 0.69);
+    font-size: 15px;
+    width: 100px;
+    height: 35px;
+    color: white;
+    font-weight: bold;
+    border-color: white;
+    border-radius: 5px;
+    border-width: 1px;
+    cursor: pointer;
+}
+
+.delete-button:hover {
+    border-color: rgba(255, 255, 255, 0.27);
 }
 </style>
