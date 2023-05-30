@@ -55,7 +55,7 @@ export default {
                 {label: 'Место установки:', value: this.equipment.installationLocation},
                 {label: 'Стоимость:', value: this.equipment.cost},
                 {label: 'Источник приобретения:', value: this.equipment.acquisitionSource},
-                {label: 'Подразделение:', value: this.equipment.unit},
+                {label: 'Подразделение:', value: this.equipment.unit ? this.equipment.unit.name:null},
                 {
                     label: 'Лицо, ответственное за функционирование оборудования:',
                     value: this.equipment.responsiblePerson
@@ -128,7 +128,6 @@ export default {
     margin-top: 30px;;
 }
 .equipment-item:hover {
-
     background-color: rgba(0, 0, 0, 0.04);
 }
 
@@ -139,12 +138,12 @@ export default {
 
 .equipment-table tr {
     font-size: 13px;
-    border-bottom: 1px solid #ccc;
+    border-bottom: 1px solid rgba(0, 85, 144, 0.69);
 }
 
 .equipment-table .name {
     font-size: 15px;
-    border-bottom: 2px solid #ccc;
+    border-bottom: 2px solid rgba(0, 85, 144, 0.69);
 }
 
 .equipment-table td {
@@ -166,7 +165,7 @@ export default {
 }
 
 .delete-button {
-    background-color: rgba(0, 85, 144, 0.69);
+    background-color: rgba(144, 0, 0, 0.69);
     font-size: 15px;
     width: 80px;
     height: 35px;

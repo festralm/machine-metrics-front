@@ -1,24 +1,49 @@
 <template>
     <div class="container">
         <div v-if="loaded">
-            <div class="date-picker">
-                <p>Расписание оборудования</p>
-                {{ this.equipmentStatistics.schedules }}
-            </div>
-            <div class="date-picker">
-                <VueDatePicker v-model="startPeriod" @update:model-value="saveStartDate" auto-apply></VueDatePicker>
-                <VueDatePicker v-model="endPeriod" @update:model-value="saveEndDate" auto-apply></VueDatePicker>
-            </div>
+            <Line v-if="lineData" :data="lineData" :options="options"/>
             <div class="up-down-percent">
-                <div class="up-down-hours">
-                    <span class="up-hours">{{ this.equipmentStatistics.upHours }} часов вкл</span> /
-                    <span class="down-hours">{{ this.equipmentStatistics.downHours }} часов выкл</span>
-                </div>
+                    <table class="equipment-table">
+                        <tr class="name">
+                            <td class="label">Вкл:</td>
+                            <td class="value">{{ parseInt(this.equipmentStatistics.upMinutes / 60) }} часов
+                                {{ this.equipmentStatistics.upMinutes % 60 }} минут
+                            </td>
+                        </tr>
+                        <tr class="name">
+                            <td class="label">Выкл:</td>
+                            <td class="value">{{ parseInt(this.equipmentStatistics.downMinutes / 60) }} часов
+                                {{ this.equipmentStatistics.downMinutes % 60 }} минут
+                            </td>
+                        </tr>
+                        <tr class="name">
+                            <td class="label">Вкл в нерабочее время:</td>
+                            <td class="value">{{ parseInt(this.equipmentStatistics.upNotScheduleMinutes / 60) }} часов
+                                {{ this.equipmentStatistics.upNotScheduleMinutes % 60 }} минут
+                            </td>
+                        </tr>
+                        <tr class="name">
+                            <td class="label">Вкл в рабочее время:</td>
+                            <td class="value">{{ parseInt(this.equipmentStatistics.upScheduleMinutes / 60) }} часов
+                                {{ this.equipmentStatistics.upScheduleMinutes % 60 }} минут ({{this.equipmentStatistics.upSchedulePercent.toFixed(2)}}%)
+                            </td>
+                        </tr>
+                        <tr class="name">
+                            <td class="label">Выкл в рабочее время:</td>
+                            <td class="value">{{ parseInt(this.equipmentStatistics.downScheduleMinutes / 60) }} часов
+                                {{ this.equipmentStatistics.downScheduleMinutes % 60 }} минут ({{ this.equipmentStatistics.downSchedulePercent.toFixed(2)}}%)
+                            </td>
+                        </tr>
+                    </table>
                 <div v-if="typeof equipmentStatistics.upPercent == 'number'" class="percent">
                     {{ this.equipmentStatistics.upPercent.toFixed(2) }}% вкл
                 </div>
             </div>
-            <Line v-if="lineData" :data="lineData" :options="options"/>
+            <div class="date-picker">
+                <VueDatePicker v-model="startPeriod" @update:model-value="saveStartDate" auto-apply></VueDatePicker>
+                <p></p>
+                <VueDatePicker v-model="endPeriod" @update:model-value="saveEndDate" auto-apply></VueDatePicker>
+            </div>
         </div>
     </div>
 </template>
@@ -230,7 +255,7 @@ export default {
     async created() {
         await this.fetchStatistics()
         if (this.loaded) {
-            if (this.equipmentStatistics && this.equipmentStatistics.equipmentData && this.equipmentStatistics.equipmentData.length > 0) {
+            if (this.equipmentStatistics && this.equipmentStatistics.equipmentData) {
                 this.startPeriod = new Date(this.equipmentStatistics.start)
                 this.endPeriod = new Date(this.equipmentStatistics.end)
             }
@@ -263,25 +288,32 @@ export default {
 </script>
 
 <style scoped>
-
-.up-down-percent {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 1.2em;
-    margin-bottom: 1em;
+.container {
+    margin: 20px 70px 20px 70px;
+}
+.equipment-table {
+    width: 600px;
+    height: 20px;
+    border-radius: 0;
+    border-width: 1px;
+    font-size: 15px;
+    outline: none;
+    margin: 20px 20px 30px 20px;
+    border-collapse: collapse;
+}
+.equipment-table tr {
+    font-size: 16px;
+    border-bottom: 1px solid rgba(0, 85, 144, 0.69);
+}
+.equipment-table td {
+    padding: 5px;
+    width: auto;
 }
 
-.up-down-hours {
-    display: flex;
-    align-items: center;
-}
-
-.up-hours, .down-hours {
-    margin: 0 0.5em;
-}
-
-.percent {
+.equipment-table .label {
     font-weight: bold;
+    text-align: right;
+    padding-right: 30px;
 }
+
 </style>

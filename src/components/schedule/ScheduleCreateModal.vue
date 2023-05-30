@@ -1,30 +1,40 @@
 <template>
     <div class="modal">
         <div class="modal-content">
-            <h2>Добавить расписание</h2>
-            <div v-if="isDefault">
-                <label for="weekday">День недели</label>
-                <p id="weekday">{{ schedule.weekday }}</p>
-            </div>
-            <div>
-                <label for="start-time">Время начала</label>
-                <VueTimepicker id="start-time" v-model="schedule.startTime" :format="format"
-                               :minute-interval="15"></VueTimepicker>
-            </div>
-            <div>
-                <label for="end-time">Время окончания</label>
-                <VueTimepicker id="end-time" v-model="schedule.endTime" :format="format"
-                               :minute-interval="15"></VueTimepicker>
-            </div>
-            <div v-if="!isDefault">
-                <label for="date">Дата</label>
-                <VueDatePicker id="date" v-model="schedule.date" auto-apply
-                               :enable-time-picker="false"></VueDatePicker>
-            </div>
-            <div class="modal-buttons">
-                <button @click="saveSchedule">Сохранить</button>
-                <button @click="$emit('close')">Отмена</button>
-            </div>
+            <p>Добавить расписание</p>
+            <table class="equipment-table">
+                <tr class="name" v-if="isDefault">
+                    <td class="label"><label for="weekday">День недели</label></td>
+                    <td class="value">{{ schedule.weekday }}</td>
+                </tr>
+                <tr class="name">
+                    <td class="label"><label for="start-time">Время начала</label></td>
+                    <td class="value">
+                        <VueTimepicker id="start-time" v-model="schedule.startTime" :format="format"
+                                       :minute-interval="15"></VueTimepicker>
+                    </td>
+                </tr>
+                <tr class="name">
+                    <td class="label"><label for="end-time">Время окончания</label></td>
+                    <td class="value">
+                        <VueTimepicker id="end-time" v-model="schedule.endTime" :format="format"
+                                       :minute-interval="15"></VueTimepicker>
+                    </td>
+                </tr>
+                <tr class="name" v-if="!isDefault">
+                    <td class="label"><label for="date">Дата</label></td>
+                    <td class="value">
+                        <VueDatePicker id="date" v-model="schedule.date" auto-apply
+                                       :enable-time-picker="false"></VueDatePicker>
+                    </td>
+                </tr>
+                <tr class="name">
+                    <td class="label"><button class="button" @click="saveSchedule">Сохранить</button></td>
+                    <td class="value">
+                    <button class="button delete-button" @click="$emit('close')">Отмена</button>
+                    </td>
+                </tr>
+            </table>
         </div>
     </div>
 </template>
@@ -94,32 +104,55 @@ export default {
 }
 
 .modal-content {
-    background-color: #fff;
-    padding: 2rem;
+    background-color: #fefefe;
+    padding: 20px;
     border-radius: 0.5rem;
 }
 
-.modal-buttons {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 1rem;
+p {
+    font-size: 20px;
+    padding-top: 0;
+    margin-top: 10px;
 }
 
-button {
-    padding: 0.5rem 1rem;
-    border: none;
-    border-radius: 0.5rem;
-    background-color: #4caf50;
-    color: #fff;
+.equipment-table select {
+    width: 150px;
+    height: 20px;
+    border-radius: 0;
+    border-width: 1px;
+    font-size: 15px;
+}
+
+.equipment-table tr {
+    font-size: 15px;
+    border-bottom: 1px solid #ccc;
+}
+
+.equipment-table td {
+    width: 150px;
+}
+
+.button {
+    background-color: rgba(0, 85, 144, 0.69);
+    font-size: 15px;
+    width: 120px;
+    height: 30px;
+    color: white;
+    font-weight: bold;
+    border-color: white;
+    border-radius: 5px;
+    border-width: 1px;
     cursor: pointer;
 }
 
-input[type="text"] {
-    padding: 0.5rem;
-    border-radius: 0.5rem;
-    border: 1px solid #ccc;
-    width: 100%;
-    margin-bottom: 1rem;
+.button:hover {
+    border-color: rgba(255, 255, 255, 0.27);
 }
+
+.delete-button {
+    margin-left: 10px;
+    background-color: rgba(144, 0, 0, 0.69);
+}
+
 
 </style>

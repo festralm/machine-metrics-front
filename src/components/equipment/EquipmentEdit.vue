@@ -2,222 +2,302 @@
     <div class="equipment-edit" v-if="formData">
         <h1 class="title">Изменить оборудование</h1>
         <form @submit.prevent="updateEquipment">
-            <div class="form-group">
-                <img class="photo" :src="photoUrl" alt="Equipment Photo" v-if="photoUrl">
-                <input id="photo" type="file" ref="photoInput" accept="image/*" @change="onPhotoChange()"/>
-                <input v-if="formData.photoPath" id="photo-delete" type="button" @click="clearPhoto()"
-                       value="Удалить фото"/>
-            </div>
-            <div class="form-group">
-                <label for="name">Наименование оборудования*</label>
-                <input id="name" type="text" v-model="formData.name" required/>
-            </div>
-            <div class="form-group">
-                <label for="inventory-number">Инвентарный номер*</label>
-                <input id="inventory-number" type="text" v-model="formData.inventoryNumber" required/>
-            </div>
-            <div class="form-group">
-                <label for="acquisitionSource">Источник приобретения*</label>
-                <input id="acquisitionSource" type="text" v-model="formData.acquisitionSource" required/>
-            </div>
-            <div class="form-group">
-                <label for="cost">Стоимость*</label>
-                <input id="cost" type="number" step="0.01" v-model="formData.cost" required/>
-            </div>
-            <div class="form-group">
-                <label for="residualCost">Начальная стоимость (балансовая стоимость)*</label>
-                <input id="residualCost" type="number" step="0.01" v-model="formData.initialCost" required/>
-            </div>
-            <div class="form-group">
-                <label for="residualCost">Остаточная стоимость*</label>
-                <input id="residualCost" type="number" step="0.01" v-model="formData.residualCost" required/>
-            </div>
-            <div class="form-group">
-                <label for="adName">Имя оборудования в AD*</label>
-                <input id="adName" type="text" v-model="formData.adName" required/>
-            </div>
-            <div class="form-group">
-                <label for="ipAddress">IP-адрес оборудования*</label>
-                <input id="ipAddress" type="text" v-model="formData.ipAddress" required/>
-            </div>
-            <div class="form-group">
-                <label for="kfu-development-program-application">Заявка программы развития КФУ</label>
-                <div id="kfu-development-program-application"
-                     v-for="(field, index) in formData.kfuDevelopmentProgramApplicationList"
-                     :key="index">
-                    <label>{{ field.label }}</label>
-                    <input v-model="field.value"/>
-                    <div @click="removeField(formData.kfuDevelopmentProgramApplicationList, index)">-</div>
+            <div class="upper-block">
+                <div class="upper-block-item photo-block">
+                    <img class="photo" :src="photoUrl" alt="Equipment Photo" v-if="photoUrl">
+                    <div class="upper-block-item photo-buttons-block">
+                        <label for="photo" class="file-input">Загрузить фото</label>
+                        <input id="photo" type="file" ref="photoInput" accept="image/*" @change="onPhotoChange()"/>
+                        <input v-if="formData.photoPath" id="photo-delete" class="delete-input" type="button"
+                               @click="clearPhoto()"
+                               value="Удалить фото"/>
+                    </div>
+                    <PhotoCropModal v-if="showModal" :photoUrl="getPhotoToCrop()"
+                                    @close="showOrCloseModal(false)"
+                                    @save="showPhoto" @cancel="cancelPhotoCrop"></PhotoCropModal>
                 </div>
-                <div @click="addField(formData.kfuDevelopmentProgramApplicationList)">+</div>
-            </div>
-            <div class="form-group">
-                <label for="warranty-service-for-representatives-of-a-foreign-party">Гарантийное обслуживание
-                    (оборудования) представителями иностранной стороны</label>
-                <input id="warranty-service-for-representatives-of-a-foreign-party" type="checkbox"
-                       v-model="formData.warrantyServiceForRepresentativesOfAForeignParty"/>
-            </div>
-            <div class="form-group">
-                <label for="kfu-development-program-priority-direction">Приоритетное направление программы развития
-                    КФУ</label>
-                <div id="kfu-development-program-priority-direction"
-                     v-for="(field, index) in formData.kfuDevelopmentProgramPriorityDirectionList" :key="index">
-                    <label>{{ field.label }}</label>
-                    <input v-model="field.value"/>
-                    <div @click="removeField(formData.kfuDevelopmentProgramPriorityDirectionList, index)">-</div>
+                <div class="upper-block-item inputs-block">
+                    <table class="equipment-table">
+                        <tr class="name">
+                            <td class="label"><label for="name">Наименование оборудования*</label></td>
+                            <td class="value"><input id="name" type="text" v-model="formData.name" required/></td>
+                        </tr>
+                        <tr class="inventory-number">
+                            <td class="label"><label for="inventory-number">Инвентарный номер*</label></td>
+                            <td class="value"><input id="inventory-number" type="text"
+                                                     v-model="formData.inventoryNumber"
+                                                     required/></td>
+                        </tr>
+                        <tr class="acquisition-source">
+                            <td class="label"><label for="acquisition-source">Источник приобретения*</label></td>
+                            <td class="value"><input id="acquisition-source" type="text"
+                                                     v-model="formData.acquisitionSource"
+                                                     required/></td>
+                        </tr>
+                        <tr class="cost">
+                            <td class="label"><label for="cost">Стоимость*</label></td>
+                            <td class="value"><input id="cost" type="number" step="0.01" v-model="formData.cost" min="0"
+                                                     required/></td>
+                        </tr>
+                        <tr class="residual-cost">
+                            <td class="label"><label for="residual-cost">Остаточная стоимость*</label></td>
+                            <td class="value"><input id="residual-cost" type="number" step="0.01"
+                                                     v-model="formData.residualCost"
+                                                     required/>
+                            </td>
+                        </tr>
+                        <tr class="initial-cost">
+                            <td class="label"><label for="initial-cost">Начальная стоимость (балансовая
+                                стоимость)*</label></td>
+                            <td class="value"><input id="initial-cost" type="number" step="0.01"
+                                                     v-model="formData.initialCost"
+                                                     required/>
+                            </td>
+                        </tr>
+                        <tr class="ad-name">
+                            <td class="label"><label for="ad-name">Имя оборудования в AD*</label></td>
+                            <td class="value"><input id="ad-name" type="text" v-model="formData.adName" required/></td>
+                        </tr>
+                        <tr class="ip-address">
+                            <td class="label"><label for="ip-address">IP-адрес оборудования*</label></td>
+                            <td class="value"><input id="ip-address" type="text" v-model="formData.ipAddress" required/>
+                            </td>
+                        </tr>
+                    </table>
                 </div>
-                <div @click="addField(formData.kfuDevelopmentProgramPriorityDirectionList)">+</div>
             </div>
-            <div class="form-group">
-                <label for="russia-development-priority-direction">Приоритетное направление развития науки и техники
-                    РФ</label>
-                <div id="russia-development-priority-direction"
-                     v-for="(field, index) in formData.russiaDevelopmentPriorityDirectionList" :key="index">
-                    <label>{{ field.label }}</label>
-                    <input v-model="field.value"/>
-                    <div @click="removeField(formData.russiaDevelopmentPriorityDirectionList, index)">-</div>
-                </div>
-                <div @click="addField(formData.russiaDevelopmentPriorityDirectionList)">+</div>
-            </div>
-            <div class="form-group">
-                <label for="area">Область применения</label>
-                <input id="area" type="text" v-model="formData.area"/>
-            </div>
-            <div class="form-group">
-                <label for="research-objects">Объекты исследования</label>
-                <input id="research=objects" type="text" v-model="formData.researchObjects"/>
-            </div>
-            <div class="form-group">
-                <label for="indicators">Определяемые показатели (величины, параметры)</label>
-                <input id="indicators" type="text" v-model="formData.indicators"/>
-            </div>
-            <div class="form-group">
-                <label for="additional-features">Дополнительные возможности</label>
-                <input id="additional-features" type="text" v-model="formData.additionalFeatures"/>
-            </div>
-            <div class="form-group">
-                <label for="purpose">Назначение</label>
-                <select id="purpose" v-model="formData.purpose">
-                    <option value=""></option>
-                    <option v-for="purpose in purposes" :key="purpose.id" :value="purpose.id">{{
-                        purpose.name
-                        }}
-                    </option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="usage-type">Тип использования</label>
-                <select id="usage-type" v-model="formData.usageType">
-                    <option value=""></option>
-                    <option v-for="usageType in usageTypes" :key="usageType.id" :value="usageType.id">{{
-                        usageType.name
-                        }}
-                    </option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="verification-required">Требуется поверка оборудования</label>
-                <input id="verification-required" type="checkbox" v-model="formData.verificationRequired"/>
-            </div>
-            <div class="form-group">
-                <label for="type">Тип оборудования</label>
-                <input id="type" type="text" v-model="formData.type"/>
-            </div>
-            <div class="form-group">
-                <label for="factory-number">Заводской номер</label>
-                <input id="factory-number" type="text" v-model="formData.factoryNumber"/>
-            </div>
-            <div class="form-group">
-                <label for="manufacturer-country">Страна-изготовитель</label>
-                <select id="manufacturer-country" v-model="formData.manufacturerCountry">
-                    <option value=""></option>
-                    <option v-for="country in countries" :key="country.id" :value="country.id">{{
-                        country.name
-                        }}
-                    </option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="manufacture-year">Год изготовления</label>
-                <input id="manufacture-year" type="number" v-model="formData.manufactureYear"/>
-            </div>
-            <div class="form-group">
-                <label for="manufacturer">Фирма-изготовитель</label>
-                <input id="manufacturer" type="text" v-model="formData.manufacturer"/>
-            </div>
-            <div class="form-group">
-                <label for="supplier">Фирма-поставщик</label>
-                <input id="supplier" type="text" v-model="formData.supplier"/>
-            </div>
-            <div class="form-group">
-                <label for="delivery-date">Дата поставки</label>
-                <VueDatePicker v-model="formData.deliveryDate" auto-apply
-                               :enable-time-picker="false"></VueDatePicker>
-            </div>
-            <div class="form-group">
-                <label for="commissioning-date">Дата ввода в эксплуатацию</label>
-                <VueDatePicker v-model="formData.commissioningDate"
-                               auto-apply
-                               :enable-time-picker="false"></VueDatePicker>
-            </div>
-            <div class="form-group">
-                <label for="brand">Марка</label>
-                <input id="brand" type="text" v-model="formData.brand"/>
-            </div>
-            <div class="form-group">
-                <label for="providing-services-to-third-parties-possibility">Возможность оказания услуг сторонним
-                    организациям</label>
-                <input id="providing-services-to-third-parties-possibility" type="checkbox"
-                       v-model="formData.providingServicesToThirdPartiesPossibility"/>
-            </div>
-            <div class="form-group">
-                <label for="collective-federal-center-use">Оборудование федерального центра коллективного
-                    пользования</label>
-                <input id="collective-federal-center-use" type="checkbox"
-                       v-model="formData.collectiveFederalCenterUse"/>
-            </div>
-            <div class="form-group">
-                <label for="unique">Уникальное оборудование</label>
-                <input id="unique" type="checkbox" v-model="formData.unique"/>
-            </div>
-            <div class="form-group">
-                <label for="collective-interdisciplinary-center-use">Междисциплинарный центр коллективного
-                    пользования</label>
-                <input id="collective-interdisciplinary-center-use" type="checkbox"
-                       v-model="formData.collectiveInterdisciplinaryCenterUse"/>
-            </div>
-            <div class="form-group">
-                <label for="portal-publication-card-readiness">Готовность карточки к публикации на портале</label>
-                <input id="portal-publication-card-readiness" type="checkbox"
-                       v-model="formData.portalPublicationCardReadiness"/>
-            </div>
-            <div class="form-group">
-                <label for="installation-location">Место установки</label>
-                <input id="installation-location" type="text" v-model="formData.installationLocation"/>
-            </div>
-            <div class="form-group">
-                <label for="unit">Страна-изготовитель</label>
-                <select id="unit" v-model="formData.unit">
-                    <option value=""></option>
-                    <option v-for="unit in units" :key="unit.id" :value="unit.id">{{
-                        unit.name
-                        }}
-                    </option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="responsible-person">Лицо, ответственное за функционирование оборудования</label>
-                <input id="responsible-person" type="text" v-model="formData.responsiblePerson"/>
-            </div>
-            <div class="form-group">
-                <label for="status">Статус оборудования</label>
-                <select id="status" v-model="formData.status">
-                    <option value=""></option>
-                    <option v-for="status in statuses" :key="status.id" :value="status.id">{{
-                        status.name
-                        }}
-                    </option>
-                </select>
+            <div class="downer-block">
+                <table class="equipment-table-2 downer-block-item">
+                    <tr class="kfu-development-program-application section">
+                        <td class="label"><label for="kfu-development-program-application">Заявка программы развития
+                            КФУ</label>
+                        </td>
+                        <td class="value">
+                            <div id="kfu-development-program-application"
+                                 v-for="(field, index) in formData.kfuDevelopmentProgramApplicationList"
+                                 :key="index">
+                                <label>{{ field.label }}</label>
+                                <input type="text" v-model="field.value"/>
+                                <input type="button" class="delete-section-button"
+                                       @click="removeField(formData.kfuDevelopmentProgramApplicationList, index)"
+                                       value="-"/>
+                            </div>
+                            <input class="add-section-button" type="button"
+                                   @click="addField(formData.kfuDevelopmentProgramApplicationList)" value="+"/>
+                        </td>
+                    </tr>
+                    <tr class="warranty-service-for-representatives-of-a-foreign-party">
+                        <td class="label"><label for="warranty-service-for-representatives-of-a-foreign-party">Гарантийное
+                            обслуживание
+                            (оборудования) представителями иностранной стороны</label></td>
+                        <td class="value"><input id="warranty-service-for-representatives-of-a-foreign-party"
+                                                 type="checkbox"
+                                                 v-model="formData.warrantyServiceForRepresentativesOfAForeignParty"/>
+                        </td>
+                    </tr>
+                    <tr class="kfu-development-program-priority-direction section">
+                        <td class="label"><label for="kfu-development-program-priority-direction">Приоритетное
+                            направление программы
+                            развития
+                            КФУ</label></td>
+                        <td class="value">
+                            <div id="kfu-development-program-priority-direction"
+                                 v-for="(field, index) in formData.kfuDevelopmentProgramPriorityDirectionList"
+                                 :key="index">
+                                <label>{{ field.label }}</label>
+                                <input type="text" v-model="field.value"/>
+                                <input type="button" class="delete-section-button"
+                                       @click="removeField(formData.kfuDevelopmentProgramPriorityDirectionList, index)"
+                                       value="-"/>
+                            </div>
+                            <input class="add-section-button" type="button"
+                                   @click="addField(formData.kfuDevelopmentProgramPriorityDirectionList)" value="+"/>
+                        </td>
+                    </tr>
+                    <tr class="russia-development-priority-direction">
+                        <td class="label"><label for="russia-development-priority-direction">Приоритетное направление
+                            развития науки и
+                            техники
+                            РФ</label></td>
+                        <td class="value">
+                            <div id="russia-development-priority-direction"
+                                 v-for="(field, index) in formData.russiaDevelopmentPriorityDirectionList" :key="index">
+                                <label>{{ field.label }}</label>
+                                <input type="text" v-model="field.value"/>
+                                <input type="button" class="delete-section-button"
+                                       @click="removeField(formData.russiaDevelopmentPriorityDirectionList, index)"
+                                       value="-"/>
+                            </div>
+                            <input type="button" class="add-section-button"
+                                   @click="addField(formData.russiaDevelopmentPriorityDirectionList)" value="+"/></td>
+                    </tr>
+                    <tr class="area">
+                        <td class="label"><label for="area">Область применения</label></td>
+                        <td class="value"><input id="area" type="text" v-model="formData.area"/></td>
+                    </tr>
+                    <tr class="research-objects">
+                        <td class="label"><label for="research-objects">Объекты исследования</label></td>
+                        <td class="value"><input id="research=objects" type="text" v-model="formData.researchObjects"/>
+                        </td>
+                    </tr>
+                    <tr class="indicators">
+                        <td class="label"><label for="indicators">Определяемые показатели (величины, параметры)</label>
+                        </td>
+                        <td class="value"><input id="indicators" type="text" v-model="formData.indicators"/></td>
+                    </tr>
+                    <tr class="additional-features">
+                        <td class="label"><label for="additional-features">Дополнительные возможности</label></td>
+                        <td class="value"><input id="additional-features" type="text"
+                                                 v-model="formData.additionalFeatures"/>
+                        </td>
+                    </tr>
+                    <tr class="purpose">
+                        <td class="label"><label for="purpose">Назначение</label></td>
+                        <td class="value">
+                            <select id="purpose" v-model="formData.purpose">
+                                <option value=""></option>
+                                <option v-for="purpose in purposes" :key="purpose.id" :value="purpose.id">{{
+                                        purpose.name
+                                    }}
+                                </option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr class="usage-type">
+                        <td class="label"><label for="usage-type">Тип использования</label></td>
+                        <td class="value"><select id="usage-type" v-model="formData.usageType">
+                            <option value=""></option>
+                            <option v-for="usageType in usageTypes" :key="usageType.id" :value="usageType.id">{{
+                                    usageType.name
+                                }}
+                            </option>
+                        </select></td>
+                    </tr>
+                    <tr class="verification-required">
+                        <td class="label"><label for="verification-required">Требуется поверка оборудования</label></td>
+                        <td class="value"><input id="verification-required" type="checkbox"
+                                                 v-model="formData.verificationRequired"/>
+                        </td>
+                    </tr>
+                </table>
+                <table class="equipment-table-2 downer-block-item">
+                    <tr class="type">
+                        <td class="label"><label for="type">Тип оборудования</label></td>
+                        <td class="value"><input id="type" type="text" v-model="formData.type"/></td>
+                    </tr>
+                    <tr class="factory-number">
+                        <td class="label"><label for="factory-number">Заводской номер</label></td>
+                        <td class="value"><input id="factory-number" type="text" v-model="formData.factoryNumber"/></td>
+                    </tr>
+                    <tr class="manufacturer-country">
+                        <td class="label"><label for="manufacturer-country">Страна-изготовитель</label></td>
+                        <td class="value"><select id="manufacturer-country" v-model="formData.manufacturerCountry">
+                            <option value=""></option>
+                            <option v-for="country in countries" :key="country.id" :value="country.id">{{
+                                    country.name
+                                }}
+                            </option>
+                        </select></td>
+                    </tr>
+                    <tr class="manufacture-year">
+                        <td class="label"><label for="manufacture-year">Год изготовления</label></td>
+                        <td class="value"><input id="manufacture-year" type="number"
+                                                 v-model="formData.manufactureYear"/></td>
+                    </tr>
+                    <tr class="manufacturer">
+                        <td class="label"><label for="manufacturer">Фирма-изготовитель</label></td>
+                        <td class="value"><input id="manufacturer" type="text" v-model="formData.manufacturer"/></td>
+                    </tr>
+                    <tr class="supplier">
+                        <td class="label"><label for="supplier">Фирма-поставщик</label></td>
+                        <td class="value"><input id="supplier" type="text" v-model="formData.supplier"/></td>
+                    </tr>
+                    <tr class="delivery-date">
+                        <td class="label"><label for="delivery-date">Дата поставки</label></td>
+                        <td class="value">
+                            <VueDatePicker v-model="formData.deliveryDate" @change="onDeliveryDateChange" auto-apply
+                                           scrollable :show-current="false" :enable-time-picker="false"></VueDatePicker>
+                        </td>
+                    </tr>
+                    <tr class="commissioning-date">
+                        <td class="label"><label for="commissioning-date">Дата ввода в эксплуатацию</label></td>
+                        <td class="value">
+                            <VueDatePicker v-model="formData.commissioningDate" @change="onCommissioningDateChange"
+                                           scrollable :show-current="false"
+                                           auto-apply
+                                           :enable-time-picker="false"></VueDatePicker>
+                        </td>
+                    </tr>
+                    <tr class="brand">
+                        <td class="label"><label for="brand">Марка</label></td>
+                        <td class="value"><input id="brand" type="text" v-model="formData.brand"/></td>
+                    </tr>
+                    <tr class="providing-services-to-third-parties-possibility">
+                        <td class="label"><label for="providing-services-to-third-parties-possibility">Возможность
+                            оказания
+                            услуг сторонним
+                            организациям</label></td>
+                        <td class="value"><input id="providing-services-to-third-parties-possibility" type="checkbox"
+                                                 v-model="formData.providingServicesToThirdPartiesPossibility"/></td>
+                    </tr>
+                    <tr class="collective-federal-center-use">
+                        <td class="label"><label for="collective-federal-center-use">Оборудование федерального центра
+                            коллективного
+                            пользования</label></td>
+                        <td class="value"><input id="collective-federal-center-use" type="checkbox"
+                                                 v-model="formData.collectiveFederalCenterUse"/></td>
+                    </tr>
+                    <tr class="unique">
+                        <td class="label"><label for="unique">Уникальное оборудование</label></td>
+                        <td class="value"><input id="unique" type="checkbox" v-model="formData.unique"/></td>
+                    </tr>
+                    <tr class="collective-interdisciplinary-center-use">
+                        <td class="label"><label for="collective-interdisciplinary-center-use">Междисциплинарный центр
+                            коллективного
+                            пользования</label></td>
+                        <td class="value"><input id="collective-interdisciplinary-center-use" type="checkbox"
+                                                 v-model="formData.collectiveInterdisciplinaryCenterUse"/></td>
+                    </tr>
+                    <tr class="portal-publication-card-readiness">
+                        <td class="label"><label for="portal-publication-card-readiness">Готовность карточки к
+                            публикации на
+                            портале</label></td>
+                        <td class="value"><input id="portal-publication-card-readiness" type="checkbox"
+                                                 v-model="formData.portalPublicationCardReadiness"/></td>
+                    </tr>
+                    <tr class="installation-location">
+                        <td class="label"><label for="installation-location">Место установки</label></td>
+                        <td class="value"><input id="installation-location" type="text"
+                                                 v-model="formData.installationLocation"/>
+                        </td>
+                    </tr>
+                    <tr class="unit">
+                        <td class="label"><label for="unit">Подразделение</label></td>
+                        <td class="value"><select id="unit" v-model="formData.unit">
+                            <option value=""></option>
+                            <option v-for="unit in units" :key="unit.id" :value="unit.id">{{
+                                    unit.name
+                                }}
+                            </option>
+                        </select></td>
+                    </tr>
+                    <tr class="responsible-person">
+                        <td class="label"><label for="responsible-person">Лицо, ответственное за функционирование
+                            оборудования</label></td>
+                        <td class="value"><input id="responsible-person" type="text"
+                                                 v-model="formData.responsiblePerson"/></td>
+                    </tr>
+                    <tr class="status">
+                        <td class="label"><label for="status">Статус оборудования</label></td>
+                        <td class="value"><select id="status" v-model="formData.status">
+                            <option value=""></option>
+                            <option v-for="status in statuses" :key="status.id" :value="status.id">{{
+                                    status.name
+                                }}
+                            </option>
+                        </select></td>
+                    </tr>
+                </table>
             </div>
             <div class="form-group">
                 <button class="save-button" type="submit">Сохранить</button>
@@ -229,9 +309,11 @@
 <script>
 
 import {mapActions, mapGetters} from 'vuex'
+import PhotoCropModal from "@/components/equipment/PhotoCropModal.vue";
 
 export default {
     name: "EquipmentEdit",
+    components: {PhotoCropModal},
     data() {
         return {
             photo: null,
@@ -279,7 +361,9 @@ export default {
                 responsiblePerson: null,
                 status: null,
                 photoPath: null,
-            }
+            },
+            croppingPhotoFile: null,
+            showModal: false,
         }
     },
     computed: {
@@ -308,7 +392,7 @@ export default {
             if (this.formData.photoPath) {
                 return this.getEquipmentPhoto()(this.$route.params.id);
             }
-            return null;
+            return this.getDefaultPhoto();
         },
     },
     async created() {
@@ -319,6 +403,7 @@ export default {
         await this.fetchCountryList();
         await this.fetchUnitList();
         await this.fetchStatusList();
+        await this.fetchDefaultPhoto();
         await this.fetchEquipmentPhoto({id: equipmentId, path: this.currentEquipment.photoPath});
     },
     methods: {
@@ -334,9 +419,8 @@ export default {
         ...mapGetters('unit', ['getUnitList']),
         ...mapActions('status', ['fetchStatusList']),
         ...mapGetters('status', ['getStatusList']),
-        ...mapActions('photo', ['fetchEquipmentPhoto']),
-        ...mapGetters('photo', ['getEquipmentPhoto']),
-        ...mapActions('photo', ['uploadPhoto']),
+        ...mapActions('photo', ['fetchEquipmentPhoto', 'fetchDefaultPhoto', 'uploadPhoto']),
+        ...mapGetters('photo', ['getEquipmentPhoto', 'getDefaultPhoto']),
         async updateEquipment() {
             if (this.photo) {
                 try {
@@ -377,20 +461,44 @@ export default {
             const photoFile = this.$refs.photoInput.files[0];
 
             if (photoFile) {
-                const formData = new FormData();
-                formData.append('name', photoFile.name);
-                formData.append('photo', photoFile);
+                this.croppingPhotoFile = photoFile
 
-                this.photo = formData
-                this.uploadedPhotoUrl = URL.createObjectURL(photoFile)
-                this.formData.photoPath = photoFile.name
+                this.showOrCloseModal(true)
             }
+        },
+        showOrCloseModal(show) {
+            this.showModal = show
         },
         clearPhoto() {
             this.$refs.photoInput.value = null
             this.photo = null
-            this.uploadedPhotoUrl = null
             this.formData.photoPath = null
+            this.uploadedPhotoUrl = null
+            this.croppingPhotoFile = null
+        },
+        showPhoto(blob) {
+            var formData = new FormData();
+            formData.append('name', this.croppingPhotoFile.name);
+            formData.append('photo', blob);
+
+            this.photo = formData
+            this.formData.photoPath = this.croppingPhotoFile.name
+            this.uploadedPhotoUrl = URL.createObjectURL(blob)
+
+            this.showOrCloseModal(false)
+        },
+        cancelPhotoCrop() {
+            this.croppingPhotoFile = null
+            this.showOrCloseModal(false)
+        },
+        getPhotoToCrop() {
+            return URL.createObjectURL(this.croppingPhotoFile)
+        },
+        onDeliveryDateChange() {
+            this.deliveryDate = this.deliveryDate ? new Date(this.deliveryDate).toISOString() : null
+        },
+        onCommissioningDateChange() {
+            this.commissioningDate = this.commissioningDate ? new Date(this.commissioningDate).toISOString() : null
         },
     },
     watch: {
@@ -445,57 +553,229 @@ export default {
 </script>
 
 <style scoped>
+
 .equipment-edit {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
+    width: 85%;
+    background-color: white;
+    flex: 1;
+}
+
+input[type="file"] {
+    display: none;
 }
 
 .title {
-    font-size: 32px;
-    margin-bottom: 20px;
-    text-align: center;
-    color: #3f51b5;
-}
-
-.form-group {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    margin-bottom: 20px;
-}
-
-label {
-    font-size: 18px;
-    margin-right: 10px;
-    color: #444;
-}
-
-input {
-    flex-grow: 1;
-    font-size: 16px;
-    padding: 10px;
-    border: none;
-    border-radius: 5px;
-}
-
-.save-button {
-    background-color: #3f51b5;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.15);
+    margin: 0;
+    padding: 20px 0 20px 0;
     color: white;
-    font-size: 18px;
-    padding: 10px 20px;
-    border: none;
+}
+
+form {
+    margin: 50px;
+}
+
+.photo {
+    width: 200px;
+}
+
+.file-input {
+    background-color: rgba(0, 85, 144, 0.69);
+    font-size: 15px;
+    width: 150px;
+    height: 30px;
+    color: white;
+    font-weight: bold;
+    border: 1px solid white;
     border-radius: 5px;
     cursor: pointer;
 }
 
-.save-button:hover {
-    background-color: #2c3e50;
+.file-input:hover {
+    border-color: rgba(255, 255, 255, 0.27);
 }
 
-.photo {
+.delete-input {
+    background-color: rgba(144, 0, 0, 0.69);
+    font-size: 15px;
+    width: 150px;
+    height: 30px;
+    color: white;
+    font-weight: bold;
+    border-color: white;
+    border-radius: 5px;
+    border-width: 1px;
+    cursor: pointer;
+    margin-top: 5px;
+}
+
+.delete-input:hover {
+    border-color: rgba(255, 255, 255, 0.27);
+}
+
+.upper-block label {
+    line-height: 30px;
+}
+
+.upper-block {
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 20px;
+}
+
+.photo-buttons-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 5px;
+}
+
+.inputs-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.inputs-block .label {
+    text-align: right;
+    padding-right: 30px;
     width: 400px;
-    height: 400px;
 }
 
+.equipment-table input[type=text], .equipment-table input[type=number] {
+    width: 250px;
+    height: 20px;
+    border-radius: 0;
+    border-width: 1px;
+}
+
+.equipment-table input[type=text], .equipment-table input[type=number] {
+    outline: none;
+}
+
+.equipment-table input[type=text], .equipment-table input[type=number] {
+    font-size: 15px;
+}
+
+.equipment-table tr {
+    font-size: 15px;
+    border-bottom: 1px solid #ccc;
+}
+
+.equipment-table td {
+    width: 300px;
+}
+
+.downer-block {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 30px;
+}
+
+.downer-block-item {
+    width: 50%;
+}
+
+.photo-block {
+    margin-left: 30px;
+}
+
+.add-section-button {
+    background-color: rgba(0, 85, 144, 0.69);
+    font-size: 15px;
+    width: 20px;
+    height: 20px;
+    color: white;
+    font-weight: bold;
+    border-color: white;
+    border-radius: 5px;
+    border-width: 1px;
+    cursor: pointer;
+    margin-top: 5px;
+    padding: 0;
+}
+
+.add-section-button:hover {
+    border-color: rgba(255, 255, 255, 0.27);
+}
+
+.delete-section-button {
+    background-color: rgba(144, 0, 0, 0.69);
+    font-size: 15px;
+    width: 21px;
+    height: 21px;
+    color: white;
+    font-weight: bold;
+    border-color: white;
+    border-radius: 5px;
+    border-width: 1px;
+    cursor: pointer;
+    margin-top: 10px;
+    margin-left: 10px;
+}
+
+.delete-section-button:hover {
+    border-color: rgba(255, 255, 255, 0.27);
+}
+
+input[type=checkbox] {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    outline: none;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgb(0, 85, 144);
+    border-radius: 3px;
+    background-color: #fff;
+    cursor: pointer;
+}
+
+input[type=checkbox]:checked {
+    background-color: rgba(0, 85, 144, 0.69);
+}
+
+.equipment-table-2 input[type=text], .equipment-table-2 input[type=number], .equipment-table-2 select {
+    width: 200px;
+    height: 20px;
+    border-radius: 0;
+    border-width: 1px;
+    font-size: 15px;
+    outline: none;
+}
+
+.equipment-table-2 select {
+    margin-top: 5px;
+    width: 205px;
+    height: 23px;
+}
+
+.equipment-table-2 tr {
+    font-size: 15px;
+    border-bottom: 1px solid #ccc;
+}
+
+.equipment-table-2 td {
+    width: 300px;
+}
+
+.save-button {
+    background-color: rgb(0, 85, 144);
+    font-size: 15px;
+    width: 200px;
+    height: 35px;
+    color: white;
+    font-weight: bold;
+    border-color: white;
+    border-radius: 5px;
+    border-width: 1px;
+    cursor: pointer;
+}
+
+.save-button:hover {
+    border-color: rgba(255, 255, 255, 0.27);
+}
 </style>
