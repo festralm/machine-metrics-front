@@ -10,9 +10,95 @@
             </button>
         </div>
         <div class="my-chart">
-            <EquipmentDataChart v-if="equipment" :equipmentId="$route.params.id"/>
+            <EquipmentDataChart :key="componentKey" v-if="equipment" :equipmentId="$route.params.id"/>
         </div>
-        <table class="equipment-table">
+        <div>
+            <p class="cron-p">Расписание получения данных</p>
+        </div>
+        <div class="equipment-schedule" v-if="equipmentSchedule">
+            <table class="equipment-table">
+                <tr class="name">
+                    <td class="label"><label for="enabled">Включено:</label></td>
+                    <td class="value">{{ equipmentSchedule.enabled ? "Да" : "Нет" }}</td>
+                </tr>
+                <tr class="name">
+                    <td class="label"><label for="data-service">Сервис данных:</label></td>
+                    <td class="value">{{
+                            equipmentSchedule.dataService ? equipmentSchedule.dataService.name : "-"
+                        }}
+                    </td>
+                </tr>
+                <tr class="name">
+                    <td class="label"><label for="cron-expression">Выражение Cron:</label></td>
+                    <td class="value">{{ equipmentSchedule.cron ? equipmentSchedule.cron.name : "-" }}</td>
+                </tr>
+                <tr class="button">
+                    <td class="label"></td>
+                    <td class="value">
+                        <button class="cron-button" v-if="canEditInfo()" @click="showOrCloseModal(true)">Изменить
+                        </button>
+                    </td>
+                </tr>
+                <EquipmentScheduleCreateModal v-if="showModal" :equipmentSchedule="equipmentSchedule"
+                                              @close="showOrCloseModal(false)"
+                                              @save="createEquipmentSchedule"></EquipmentScheduleCreateModal>
+            </table>
+        </div>
+        <div>
+            <p class="cron-p">График работы</p>
+        </div>
+        <div class="schedule-expressions-list">
+            <div v-if="equipmentScheduleList && equipmentScheduleList.length > 0">
+                <table class="equipment-table" v-for="schedule in equipmentScheduleList" :key="schedule.id">
+                    <tr class="name">
+                        <td class="label"><label for="startTime">Время начала</label></td>
+                        <td class="value">{{ schedule.startTime }}</td>
+                    </tr>
+                    <tr class="name">
+                        <td class="label"><label for="endTime">Время окончания</label></td>
+                        <td class="value">{{ schedule.endTime }}</td>
+                    </tr>
+                    <tr class="name">
+                        <td class="label"><label for="date">Дата</label></td>
+                        <td class="value">{{ formatDate(schedule.date) }}</td>
+                    </tr>
+                    <tr class="button">
+                        <td class="label"></td>
+                        <td class="value">
+                            <button class="cron-button" @click="showOrCloseScheduleModal(true, schedule.id)">
+                                Редактировать
+                            </button>
+                            <button class="cron-button delete-button" v-if="canDelete()"
+                                    @click="deleteSchedule(schedule.id)">Удалить
+                            </button>
+                        </td>
+                    </tr>
+                    <tr class="button">
+                        <td class="label"></td>
+                        <td class="value">
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div v-else>
+                <p>Нет доступных расписаний</p>
+            </div>
+            <table class="equipment-table">
+                <tr class="button">
+                    <td class="label"></td>
+                    <td class="value">
+                        <button class="cron-button schedule-button" v-if="canEditInfo()"
+                                @click="showOrCloseScheduleModal(true)">Задать график
+                            работы
+                        </button>
+                    </td>
+                </tr>
+            </table>
+            <ScheduleCreateModal v-if="showScheduleModal" :editingSchedule="editingSchedule" :isDefault="false"
+                                 @close="showOrCloseScheduleModal(false)"
+                                 @save="createSchedule"></ScheduleCreateModal>
+        </div>
+        <table class="equipment-table equipment-info">
             <tr class="name">
                 <td class="label"><label for="inventory-number">Инвентарный номер</label></td>
                 <td class="value"><span id="inventory-number">{{ equipment.inventoryNumber }}</span></td>
@@ -202,92 +288,7 @@
             </tr>
         </table>
 
-        <div>
-            <p class="cron-p">Расписание получения данных</p>
-        </div>
-        <div class="equipment-schedule" v-if="equipmentSchedule">
-            <table class="equipment-table">
-                <tr class="name">
-                    <td class="label"><label for="enabled">Включено:</label></td>
-                    <td class="value">{{ equipmentSchedule.enabled ? "Да" : "Нет" }}</td>
-                </tr>
-                <tr class="name">
-                    <td class="label"><label for="data-service">Сервис данных:</label></td>
-                    <td class="value">{{
-                            equipmentSchedule.dataService ? equipmentSchedule.dataService.name : ""
-                        }}
-                    </td>
-                </tr>
-                <tr class="name">
-                    <td class="label"><label for="cron-expression">Выражение Cron:</label></td>
-                    <td class="value">{{ equipmentSchedule.cron ? equipmentSchedule.cron.name : "" }}</td>
-                </tr>
-                <tr class="button">
-                    <td class="label"></td>
-                    <td class="value">
-                        <button class="cron-button" v-if="canEditInfo()" @click="showOrCloseModal(true)">Изменить
-                        </button>
-                    </td>
-                </tr>
-                <EquipmentScheduleCreateModal v-if="showModal" :equipmentSchedule="equipmentSchedule"
-                                              @close="showOrCloseModal(false)"
-                                              @save="createEquipmentSchedule"></EquipmentScheduleCreateModal>
-            </table>
-        </div>
-        <div>
-            <p class="cron-p">График работы</p>
-        </div>
-        <div class="schedule-expressions-list">
-            <div v-if="equipmentScheduleList && equipmentScheduleList.length > 0">
-                <table class="equipment-table" v-for="schedule in equipmentScheduleList" :key="schedule.id">
-                    <tr class="name">
-                        <td class="label"><label for="startTime">Время начала</label></td>
-                        <td class="value">{{ schedule.startTime }}</td>
-                    </tr>
-                    <tr class="name">
-                        <td class="label"><label for="endTime">Время окончания</label></td>
-                        <td class="value">{{ schedule.endTime }}</td>
-                    </tr>
-                    <tr class="name">
-                        <td class="label"><label for="date">Дата</label></td>
-                        <td class="value">{{ formatDate(schedule.date) }}</td>
-                    </tr>
-                    <tr class="button">
-                        <td class="label"></td>
-                        <td class="value">
-                            <button class="cron-button" @click="showOrCloseScheduleModal(true, schedule.id)">
-                                Редактировать
-                            </button>
-                            <button class="cron-button delete-button" v-if="canDelete()"
-                                    @click="deleteSchedule(schedule.id)">Удалить
-                            </button>
-                        </td>
-                    </tr>
-                    <tr class="button">
-                        <td class="label"></td>
-                        <td class="value">
-                        </td>
-                    </tr>
-                </table>
-            </div>
-            <div v-else>
-                <p>Нет доступных расписаний</p>
-            </div>
-            <table class="equipment-table">
-                <tr class="button">
-                    <td class="label"></td>
-                    <td class="value">
-                        <button class="cron-button schedule-button" v-if="canEditInfo()"
-                                @click="showOrCloseScheduleModal(true)">Задать график
-                            работы
-                        </button>
-                    </td>
-                </tr>
-            </table>
-            <ScheduleCreateModal v-if="showScheduleModal" :editingSchedule="editingSchedule" :isDefault="false"
-                                 @close="showOrCloseScheduleModal(false)"
-                                 @save="createSchedule"></ScheduleCreateModal>
-        </div>
+
     </div>
 </template>
 
@@ -305,6 +306,7 @@ export default {
             showModal: false,
             showScheduleModal: false,
             editingSchedule: {},
+            componentKey: 0,
         }
     },
     computed: {
@@ -379,6 +381,7 @@ export default {
             const response = await this.saveSchedule(scheduleData)
             if (response.ok) {
                 this.showOrCloseScheduleModal(false)
+                this.componentKey++;
             }
         },
         canUpdate() {
@@ -422,6 +425,10 @@ export default {
 .equipment-table {
     width: 100%;
     border-collapse: collapse;
+}
+
+.equipment-info {
+    margin-bottom: 30px;
 }
 
 .equipment-table tr {
@@ -497,7 +504,7 @@ input[type=checkbox]:checked {
 .schedule-button {
     width: 200px;
     background-color: rgba(0, 85, 144, 0.69);
-    margin-bottom: 30px;
+    margin-bottom: 10px;
 }
 
 .button-group {

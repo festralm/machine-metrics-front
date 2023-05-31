@@ -21,7 +21,7 @@
                     </tr>
                 </table>
                 <div class="buttons">
-                    <button class="edit-button " @click="showOrCloseModal(true, cron.id)">Редактировать</button>
+                    <button class="edit-button" @click="showOrCloseModal(true, cron.id)">Редактировать</button>
                     <button class="delete-button edit-button " v-if="canDelete()"
                             @click="deleteCronExpression(cron.id)">
                         Удалить
@@ -174,13 +174,8 @@ export default {
 }
 
 .equipment-table tr {
-    font-size: 13px;
-    border-bottom: 1px solid rgba(0, 85, 144, 0.69);
-}
-
-.equipment-table .name {
     font-size: 15px;
-    border-bottom: 2px solid rgba(0, 85, 144, 0.69);
+    border-bottom: 1px solid rgba(0, 85, 144, 0.69);
 }
 
 .equipment-table td {

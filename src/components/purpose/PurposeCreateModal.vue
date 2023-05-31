@@ -1,7 +1,7 @@
 <template>
     <div class="modal">
         <div class="modal-content">
-            <p>Добавить назначений</p>
+            <p>Добавить назначение</p>
             <table class="equipment-table">
                 <tr class="name">
                     <td class="label"><label for="name">Название:</label></td>

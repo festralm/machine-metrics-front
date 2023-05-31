@@ -5,20 +5,20 @@
             <table class="equipment-table">
                 <tr class="name" v-if="isDefault">
                     <td class="label"><label for="weekday">День недели</label></td>
-                    <td class="value">{{ schedule.weekday }}</td>
+                    <td class="value">{{ getWeekDayName(schedule.weekday) }}</td>
                 </tr>
                 <tr class="name">
                     <td class="label"><label for="start-time">Время начала</label></td>
                     <td class="value">
                         <VueTimepicker id="start-time" v-model="schedule.startTime" :format="format"
-                                       :minute-interval="15"></VueTimepicker>
+                                       :minute-interval="15" close-on-complete></VueTimepicker>
                     </td>
                 </tr>
                 <tr class="name">
                     <td class="label"><label for="end-time">Время окончания</label></td>
                     <td class="value">
                         <VueTimepicker id="end-time" v-model="schedule.endTime" :format="format"
-                                       :minute-interval="15"></VueTimepicker>
+                                       :minute-interval="15"  close-on-complete></VueTimepicker>
                     </td>
                 </tr>
                 <tr class="name" v-if="!isDefault">
@@ -64,6 +64,7 @@ export default {
                 startTime: "00:00",
                 endTime: "00:00",
             },
+            weekdays: ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'],
         }
     },
     created() {
@@ -87,6 +88,9 @@ export default {
     methods: {
         saveSchedule() {
             this.$emit('save', this.schedule);
+        },
+        getWeekDayName(weekday) {
+            return this.weekdays[weekday - 1]
         },
     },
 }

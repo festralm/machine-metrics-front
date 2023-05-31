@@ -2,47 +2,51 @@
     <div class="container">
         <div v-if="loaded">
             <Line v-if="lineData" :data="lineData" :options="options"/>
+            <div class="date-picker">
+                {{}}
+                <VueDatePicker v-model="startPeriod" @update:model-value="saveStartDate" auto-apply
+                               :max-date="endPeriod" :max-time="getMaxTime()"></VueDatePicker>
+                <p></p>
+                <VueDatePicker v-model="endPeriod" @update:model-value="saveEndDate" auto-apply></VueDatePicker>
+            </div>
             <div class="up-down-percent">
-                    <table class="equipment-table">
-                        <tr class="name">
-                            <td class="label">Вкл:</td>
-                            <td class="value">{{ parseInt(this.equipmentStatistics.upMinutes / 60) }} часов
-                                {{ this.equipmentStatistics.upMinutes % 60 }} минут
-                            </td>
-                        </tr>
-                        <tr class="name">
-                            <td class="label">Выкл:</td>
-                            <td class="value">{{ parseInt(this.equipmentStatistics.downMinutes / 60) }} часов
-                                {{ this.equipmentStatistics.downMinutes % 60 }} минут
-                            </td>
-                        </tr>
-                        <tr class="name">
-                            <td class="label">Вкл в нерабочее время:</td>
-                            <td class="value">{{ parseInt(this.equipmentStatistics.upNotScheduleMinutes / 60) }} часов
-                                {{ this.equipmentStatistics.upNotScheduleMinutes % 60 }} минут
-                            </td>
-                        </tr>
-                        <tr class="name">
-                            <td class="label">Вкл в рабочее время:</td>
-                            <td class="value">{{ parseInt(this.equipmentStatistics.upScheduleMinutes / 60) }} часов
-                                {{ this.equipmentStatistics.upScheduleMinutes % 60 }} минут ({{this.equipmentStatistics.upSchedulePercent.toFixed(2)}}%)
-                            </td>
-                        </tr>
-                        <tr class="name">
-                            <td class="label">Выкл в рабочее время:</td>
-                            <td class="value">{{ parseInt(this.equipmentStatistics.downScheduleMinutes / 60) }} часов
-                                {{ this.equipmentStatistics.downScheduleMinutes % 60 }} минут ({{ this.equipmentStatistics.downSchedulePercent.toFixed(2)}}%)
-                            </td>
-                        </tr>
-                    </table>
+                <table class="equipment-table">
+                    <tr class="total-up">
+                        <td class="label">Вкл:</td>
+                        <td class="value">{{ parseInt(this.equipmentStatistics.upMinutes / 60) }} часов
+                            {{ this.equipmentStatistics.upMinutes % 60 }} минут
+                        </td>
+                    </tr>
+                    <tr class="total-down">
+                        <td class="label">Выкл:</td>
+                        <td class="value">{{ parseInt(this.equipmentStatistics.downMinutes / 60) }} часов
+                            {{ this.equipmentStatistics.downMinutes % 60 }} минут
+                        </td>
+                    </tr>
+                    <tr class="up-not-schedule">
+                        <td class="label">Вкл в нерабочее время:</td>
+                        <td class="value">{{ parseInt(this.equipmentStatistics.upNotScheduleMinutes / 60) }} часов
+                            {{ this.equipmentStatistics.upNotScheduleMinutes % 60 }} минут
+                        </td>
+                    </tr>
+                    <tr class="up-schedule">
+                        <td class="label">Вкл в рабочее время:</td>
+                        <td class="value">{{ parseInt(this.equipmentStatistics.upScheduleMinutes / 60) }} часов
+                            {{ this.equipmentStatistics.upScheduleMinutes % 60 }} минут
+                            ({{ this.equipmentStatistics.upSchedulePercent.toFixed(2) }}%)
+                        </td>
+                    </tr>
+                    <tr class="down-schedule">
+                        <td class="label">Выкл в рабочее время:</td>
+                        <td class="value">{{ parseInt(this.equipmentStatistics.downScheduleMinutes / 60) }} часов
+                            {{ this.equipmentStatistics.downScheduleMinutes % 60 }} минут
+                            ({{ this.equipmentStatistics.downSchedulePercent.toFixed(2) }}%)
+                        </td>
+                    </tr>
+                </table>
                 <div v-if="typeof equipmentStatistics.upPercent == 'number'" class="percent">
                     {{ this.equipmentStatistics.upPercent.toFixed(2) }}% вкл
                 </div>
-            </div>
-            <div class="date-picker">
-                <VueDatePicker v-model="startPeriod" @update:model-value="saveStartDate" auto-apply></VueDatePicker>
-                <p></p>
-                <VueDatePicker v-model="endPeriod" @update:model-value="saveEndDate" auto-apply></VueDatePicker>
             </div>
         </div>
     </div>
@@ -122,7 +126,7 @@ export default {
                         duration: 1000,
                         easing: 'linear',
                         from: 1,
-                        to: 0,
+                        to: 0.4,
                     }
                 },
                 plugins: {
@@ -175,7 +179,9 @@ export default {
                     const value = context.dataset.data[index];
                     if (value) {
                         return value.enabledDuringPassiveTime ? `rgb(255, 186, 0, ${transitivity})` :
-                            value.disabledDuringActiveTime ? `rgb(255, 0, 0, ${transitivity})` : `rgba(0, 0, 0, ${transitivity})`;
+                            value.disabledDuringActiveTime ? `rgb(255, 0, 0, ${transitivity})` :
+                                (value.enabled && !value.enabledDuringPassiveTime) ? `rgb(3, 213, 3, ${transitivity})` :
+                                    `rgba(0, 0, 0, ${transitivity})`;
                     }
                 },
                 pointBackgroundColor: function (context) {
@@ -184,7 +190,9 @@ export default {
                     const value = context.dataset.data[index];
                     if (value) {
                         return value.enabledDuringPassiveTime ? `rgb(255, 186, 0, ${transitivity})` :
-                            value.disabledDuringActiveTime ? `rgb(255, 0, 0, ${transitivity})` : `rgba(0, 0, 0, ${transitivity})`;
+                            value.disabledDuringActiveTime ? `rgb(255, 0, 0, ${transitivity})` :
+                                (value.enabled && !value.enabledDuringPassiveTime) ? `rgb(3, 213, 3, ${transitivity})` :
+                                    `rgba(0, 0, 0, ${transitivity})`;
                     }
                 },
                 pointBorderColor: function (context) {
@@ -193,7 +201,9 @@ export default {
                     const value = context.dataset.data[index];
                     if (value) {
                         return value.enabledDuringPassiveTime ? `rgb(255, 186, 0, ${transitivity})` :
-                            value.disabledDuringActiveTime ? `rgb(255, 0, 0, ${transitivity})` : `rgba(0, 0, 0, ${transitivity})`;
+                            value.disabledDuringActiveTime ? `rgb(255, 0, 0, ${transitivity})` :
+                                (value.enabled && !value.enabledDuringPassiveTime) ? `rgb(3, 213, 3, ${transitivity})` :
+                                    `rgba(0, 0, 0, ${transitivity})`;
                     }
                 },
                 pointHoverBorderColor: function (context) {
@@ -202,7 +212,9 @@ export default {
                     const value = context.dataset.data[index];
                     if (value) {
                         return value.enabledDuringPassiveTime ? `rgb(255, 186, 0, ${transitivity})` :
-                            value.disabledDuringActiveTime ? `rgb(255, 0, 0, ${transitivity})` : `rgba(0, 0, 0, ${transitivity})`;
+                            value.disabledDuringActiveTime ? `rgb(255, 0, 0, ${transitivity})` :
+                                (value.enabled && !value.enabledDuringPassiveTime) ? `rgb(3, 213, 3, ${transitivity})` :
+                                    `rgba(0, 0, 0, ${transitivity})`;
                     }
                 },
                 pointBorderWidth: 2,
@@ -222,6 +234,7 @@ export default {
                                 size: 15,
                             }
                         },
+                        min: 0,
                     },
                     x: {
                         adapters: {
@@ -253,6 +266,8 @@ export default {
         },
     },
     async created() {
+        this.startPeriod = this.$route.query.startPeriod ? new Date(this.$route.query.startPeriod) : null
+        this.endPeriod = this.$route.query.endPeriod ? new Date(this.$route.query.endPeriod) : null
         await this.fetchStatistics()
         if (this.loaded) {
             if (this.equipmentStatistics && this.equipmentStatistics.equipmentData) {
@@ -273,6 +288,10 @@ export default {
             await this.fetchStatistics()
         },
         async fetchStatistics() {
+            console.log(this.startPeriod)
+            if (!!this.startPeriod && !!this.endPeriod && this.startPeriod.getTime() >= this.endPeriod.getTime()) {
+                this.startPeriod.setMinutes(this.endPeriod.getMinutes() - 5)
+            }
             this.loaded = false
             await this.fetchEquipmentStatistics(
                 {
@@ -281,8 +300,30 @@ export default {
                     stop: this.endPeriod ? this.endPeriod.toISOString() : null
                 }
             )
+            this.$router.push({
+                name: 'EquipmentDetails',
+                params: {id: this.equipmentId},
+                query: {
+                    startPeriod: this.startPeriod,
+                    endPeriod: this.endPeriod,
+                },
+            });
             this.loaded = !!this.equipmentStatistics
         },
+        getMaxTime() {
+            if (this.startPeriod && this.endPeriod) {
+                var sameDay = this.startPeriod.getFullYear() === this.endPeriod.getFullYear() &&
+                    this.startPeriod.getMonth() === this.endPeriod.getMonth() &&
+                    this.startPeriod.getDate() === this.endPeriod.getDate()
+                var sameHour = sameDay && this.startPeriod.getHours() === this.endPeriod.getHours()
+                console.log(sameHour)
+                return {
+                    hours: sameDay ? this.endPeriod.getHours() : 25,
+                    minutes:sameHour ? (this.endPeriod.getMinutes() - 1) :  61
+                }
+            }
+            return null
+        }
     }
 }
 </script>
@@ -305,6 +346,7 @@ export default {
     font-size: 16px;
     border-bottom: 1px solid rgba(0, 85, 144, 0.69);
 }
+
 .equipment-table td {
     padding: 5px;
     width: auto;
@@ -316,4 +358,15 @@ export default {
     padding-right: 30px;
 }
 
+.up-not-schedule {
+    color: rgb(255, 186, 0, 1);
+}
+
+.down-schedule {
+    color: rgb(255, 0, 0, 1);
+}
+
+.up-schedule {
+    color: rgb(3, 213, 3, 1);
+}
 </style>

@@ -6,7 +6,7 @@
         </div>
         <div v-if="purposeList.length > 0">
             <div class="equipment-item" v-for="purpose in purposeList" :key="purpose.id">
-                <span>{{ purpose.name }}</span>
+                <h2>{{ purpose.name }}</h2>
                 <button class="delete-button" v-if="canDelete()" @click="deletePurpose(purpose.id)">Удалить</button>
             </div>
         </div>

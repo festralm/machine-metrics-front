@@ -119,7 +119,6 @@ export default {
                 "page": this.currentPage,
             });
             if (this.currentPage !== 0) {
-                console.log(this.currentPage)
                 this.$router.push({
                     name: "EquipmentList",
                     query: {

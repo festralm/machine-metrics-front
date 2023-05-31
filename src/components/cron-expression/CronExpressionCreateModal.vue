@@ -4,16 +4,16 @@
             <p>Добавить cron-выражение</p>
             <table class="equipment-table">
                 <tr class="name">
-                    <td class="label"><label for="name">Выражение:</label></td>
-                    <td class="value"><input type="text" v-model="cron.expression" id="expression"></td>
+                    <td class="label"><label for="name">Название:</label></td>
+                    <td class="value"><input type="text" v-model="cron.name" id="name"></td>
                 </tr>
                 <tr class="name">
                     <td class="label"><label for="name">Порядок:</label></td>
                     <td class="value"><input type="text" v-model="cron.order" id="order"></td>
                 </tr>
                 <tr class="name">
-                    <td class="label"><label for="name">Название:</label></td>
-                    <td class="value"><input type="text" v-model="cron.name" id="name"></td>
+                    <td class="label"><label for="name">Выражение:</label></td>
+                    <td class="value"><input type="text" v-model="cron.expression" id="expression"></td>
                 </tr>
                 <tr class="name">
                     <td class="label">
