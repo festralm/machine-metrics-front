@@ -262,12 +262,12 @@
                         <td class="value"><input id="installation-location" type="text" v-model="installationLocation"/>
                         </td>
                     </tr>
-                    <tr class="unit">
-                        <td class="label"><label for="unit">Подразделение</label></td>
-                        <td class="value"><select id="unit" v-model="unit">
+                    <tr class="address">
+                        <td class="label"><label for="address">Адрес</label></td>
+                        <td class="value"><select id="address" v-model="address">
                             <option value=""></option>
-                            <option v-for="unit in units" :key="unit.id" :value="unit.id">{{
-                                    unit.name
+                            <option v-for="address in addresses" :key="address.id" :value="address.id">{{
+                                    address.address
                                 }}
                             </option>
                         </select></td>
@@ -340,7 +340,7 @@ export default {
             collectiveInterdisciplinaryCenterUse: false,
             portalPublicationCardReadiness: false,
             installationLocation: null,
-            unit: null,
+            address: null,
             responsiblePerson: null,
             status: null,
             photoPath: null,
@@ -359,8 +359,8 @@ export default {
         countries() {
             return this.getCountryList();
         },
-        units() {
-            return this.getUnitList();
+        addresses() {
+            return this.getAddressList();
         },
         statuses() {
             return this.getStatusList();
@@ -376,7 +376,7 @@ export default {
         await this.fetchPurposeList();
         await this.fetchUsageTypeList();
         await this.fetchCountryList();
-        await this.fetchUnitList();
+        await this.fetchAddressList();
         await this.fetchStatusList();
         await this.fetchDefaultPhoto();
         this.showOrCloseModal(false)
@@ -390,8 +390,8 @@ export default {
         ...mapGetters('usageType', ['getUsageTypeList']),
         ...mapActions('country', ['fetchCountryList']),
         ...mapGetters('country', ['getCountryList']),
-        ...mapActions('unit', ['fetchUnitList']),
-        ...mapGetters('unit', ['getUnitList']),
+        ...mapActions('address', ['fetchAddressList']),
+        ...mapGetters('address', ['getAddressList']),
         ...mapActions('status', ['fetchStatusList']),
         ...mapGetters('status', ['getStatusList']),
         ...mapActions('photo', ['uploadPhoto', 'fetchDefaultPhoto']),
@@ -440,7 +440,7 @@ export default {
                 collectiveInterdisciplinaryCenterUse: this.collectiveInterdisciplinaryCenterUse,
                 portalPublicationCardReadiness: this.portalPublicationCardReadiness,
                 installationLocation: this.installationLocation,
-                unit: this.unit,
+                address: this.address,
                 responsiblePerson: this.responsiblePerson,
                 status: this.status,
                 photoPath: this.photoPath,

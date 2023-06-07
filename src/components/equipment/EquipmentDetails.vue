@@ -13,7 +13,7 @@
             <EquipmentDataChart :key="componentKey" v-if="equipment" :equipmentId="$route.params.id"/>
         </div>
         <div>
-            <p class="cron-p">Расписание получения данных</p>
+            <p class="cron-p">Частота сбора данных</p>
         </div>
         <div class="equipment-schedule" v-if="equipmentSchedule">
             <table class="equipment-table">
@@ -270,8 +270,8 @@
                 <td class="value"><span id="installationLocation">{{ equipment.installationLocation }}</span></td>
             </tr>
             <tr class="name">
-                <td class="label"><label for="unit">Подразделение</label></td>
-                <td class="value"><span id="unit">{{ equipment.unit ? equipment.unit.name : null }}</span></td>
+                <td class="label"><label for="address">Адрес</label></td>
+                <td class="value"><span id="address">{{ equipment.address ? equipment.address.address : null }}</span></td>
             </tr>
             <tr class="name">
                 <td class="label"><label for="responsiblePerson">Лицо, ответственное за функционирование

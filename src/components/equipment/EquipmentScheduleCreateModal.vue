@@ -1,7 +1,7 @@
 <template>
     <div class="modal">
         <div class="modal-content">
-            <p>Изменить расписание</p>
+            <p>Изменить частоту сбора данных</p>
             <div class="equipment-schedule">
                 <table class="equipment-table">
                     <tr class="name">

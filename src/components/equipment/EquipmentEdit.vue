@@ -271,12 +271,12 @@
                                                  v-model="formData.installationLocation"/>
                         </td>
                     </tr>
-                    <tr class="unit">
-                        <td class="label"><label for="unit">Подразделение</label></td>
-                        <td class="value"><select id="unit" v-model="formData.unit">
+                    <tr class="address">
+                        <td class="label"><label for="address">Адрес</label></td>
+                        <td class="value"><select id="address" v-model="formData.address">
                             <option value=""></option>
-                            <option v-for="unit in units" :key="unit.id" :value="unit.id">{{
-                                    unit.name
+                            <option v-for="address in addresses" :key="address.id" :value="address.id">{{
+                                    address.address
                                 }}
                             </option>
                         </select></td>
@@ -357,7 +357,7 @@ export default {
                 collectiveInterdisciplinaryCenterUse: false,
                 portalPublicationCardReadiness: false,
                 installationLocation: null,
-                unit: null,
+                address: null,
                 responsiblePerson: null,
                 status: null,
                 photoPath: null,
@@ -379,8 +379,8 @@ export default {
         countries() {
             return this.getCountryList();
         },
-        units() {
-            return this.getUnitList();
+        addresses() {
+            return this.getAddressList();
         },
         statuses() {
             return this.getStatusList();
@@ -401,7 +401,7 @@ export default {
         await this.fetchPurposeList();
         await this.fetchUsageTypeList();
         await this.fetchCountryList();
-        await this.fetchUnitList();
+        await this.fetchAddressList();
         await this.fetchStatusList();
         await this.fetchDefaultPhoto();
         await this.fetchEquipmentPhoto({id: equipmentId, path: this.currentEquipment.photoPath});
@@ -415,8 +415,8 @@ export default {
         ...mapGetters('usageType', ['getUsageTypeList']),
         ...mapActions('country', ['fetchCountryList']),
         ...mapGetters('country', ['getCountryList']),
-        ...mapActions('unit', ['fetchUnitList']),
-        ...mapGetters('unit', ['getUnitList']),
+        ...mapActions('address', ['fetchAddressList']),
+        ...mapGetters('address', ['getAddressList']),
         ...mapActions('status', ['fetchStatusList']),
         ...mapGetters('status', ['getStatusList']),
         ...mapActions('photo', ['fetchEquipmentPhoto', 'fetchDefaultPhoto', 'uploadPhoto']),
@@ -540,7 +540,7 @@ export default {
                     collectiveInterdisciplinaryCenterUse: equipment.collectiveInterdisciplinaryCenterUse,
                     portalPublicationCardReadiness: equipment.portalPublicationCardReadiness,
                     installationLocation: equipment.installationLocation,
-                    unit: equipment.unit ? equipment.unit.id : null,
+                    address: equipment.address ? equipment.address.id : null,
                     responsiblePerson: equipment.responsiblePerson,
                     status: equipment.status ? equipment.status.id : null,
                     photoPath: equipment.photoPath,

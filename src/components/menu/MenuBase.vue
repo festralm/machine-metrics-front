@@ -41,6 +41,9 @@
                     <li v-if="canGetUnit()">
                         <router-link :to="{ name: 'UnitList' }">Список подразделений</router-link>
                     </li>
+                    <li v-if="canGetAddress()">
+                        <router-link :to="{ name: 'AddressList' }">Список адресов</router-link>
+                    </li>
                     <li v-if="canGetUsageType()">
                         <router-link :to="{ name: 'UsageTypeList' }">Список типов использования оборудования
                         </router-link>
@@ -112,6 +115,9 @@ export default {
             return this.role === 'ADMIN' || this.role === 'MODERATOR'
         },
         canGetUnit() {
+            return this.role === 'ADMIN' || this.role === 'MODERATOR'
+        },
+        canGetAddress() {
             return this.role === 'ADMIN' || this.role === 'MODERATOR'
         },
         canGetUsageType() {

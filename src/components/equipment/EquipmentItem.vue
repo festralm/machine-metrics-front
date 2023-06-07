@@ -55,7 +55,7 @@ export default {
                 {label: 'Место установки:', value: this.equipment.installationLocation},
                 {label: 'Стоимость:', value: this.equipment.cost},
                 {label: 'Источник приобретения:', value: this.equipment.acquisitionSource},
-                {label: 'Подразделение:', value: this.equipment.unit ? this.equipment.unit.name:null},
+                {label: 'Подразделение:', value: this.equipment.address ? this.equipment.address.address:null},
                 {
                     label: 'Лицо, ответственное за функционирование оборудования:',
                     value: this.equipment.responsiblePerson

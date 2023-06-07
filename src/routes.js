@@ -15,6 +15,7 @@ import CountryList from "@/components/country/CountryList.vue";
 import PurposeList from "@/components/purpose/PurposeList.vue";
 import StatusList from "@/components/status/StatusList.vue";
 import UnitList from "@/components/unit/UnitList.vue";
+import AddressList from "@/components/address/AddressList.vue";
 import UsageTypeList from "@/components/usage-type/UsageTypeList.vue";
 import ScheduleList from "@/components/schedule/ScheduleList.vue";
 
@@ -103,6 +104,11 @@ const routes = [
         path: "/unit",
         name: "UnitList",
         component: UnitList,
+    },
+    {
+        path: "/address",
+        name: "AddressList",
+        component: AddressList,
     },
     {
         path: "/usage-type",
