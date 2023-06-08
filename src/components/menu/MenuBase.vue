@@ -15,6 +15,9 @@
             <div class="buttons-item">
                 <router-link :to="{ name: 'EquipmentList' , query: {}}">Оборудование</router-link>
             </div>
+            <div class="buttons-item">
+                <router-link :to="{ name: 'EquipmentStatistics' , query: {}}">Статистика</router-link>
+            </div>
             <div class="dropdown" v-if="hasAdminRights()">
                 <span class="dropbtn buttons-item">
                     Администрирование

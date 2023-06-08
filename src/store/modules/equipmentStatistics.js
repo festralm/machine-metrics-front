@@ -15,14 +15,14 @@ const equipmentStatistics = {
         async fetchEquipmentStatistics({commit}, data) {
             try {
                 let url = `${API_URL}/equipment-data`;
-                if (data.id) {
-                    url += `?id=${data.id}`;
+                if (data.ids) {
+                    url += `?ids=${data.ids}`;
                 }
                 if (data.start) {
-                    url += `${data.id ? '&' : '?'}start=${data.start}`;
+                    url += `${data.ids ? '&' : '?'}start=${data.start}`;
                 }
                 if (data.stop) {
-                    url += `${data.id || data.start ? '&' : '?'}stop=${data.stop}`;
+                    url += `${data.ids || data.start ? '&' : '?'}stop=${data.stop}`;
                 }
                 const response = await fetchWithResponseCheck(url)
                 const equipmentStatistics = await response.json()

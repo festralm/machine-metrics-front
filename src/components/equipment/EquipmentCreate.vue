@@ -263,9 +263,8 @@
                         </td>
                     </tr>
                     <tr class="address">
-                        <td class="label"><label for="address">Адрес</label></td>
-                        <td class="value"><select id="address" v-model="address">
-                            <option value=""></option>
+                        <td class="label"><label for="address">Адрес*</label></td>
+                        <td class="value"><select id="address" v-model="address" required>
                             <option v-for="address in addresses" :key="address.id" :value="address.id">{{
                                     address.address
                                 }}

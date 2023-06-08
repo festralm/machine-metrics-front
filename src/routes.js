@@ -18,6 +18,7 @@ import UnitList from "@/components/unit/UnitList.vue";
 import AddressList from "@/components/address/AddressList.vue";
 import UsageTypeList from "@/components/usage-type/UsageTypeList.vue";
 import ScheduleList from "@/components/schedule/ScheduleList.vue";
+import EquipmentStatistics from "@/components/statistics/EquipmentStatistics.vue";
 
 const routes = [
     {
@@ -29,6 +30,11 @@ const routes = [
         path: "/",
         name: "EquipmentList",
         component: EquipmentList,
+    },
+    {
+        path: "/statistics",
+        name: "EquipmentStatistics",
+        component: EquipmentStatistics,
     },
     {
         path: "/data-service",

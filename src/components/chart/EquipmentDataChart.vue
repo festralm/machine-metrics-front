@@ -1,51 +1,67 @@
 <template>
     <div class="container">
+        <div v-if="chooseEquipment" class="choose-unit">
+            Выберите оборудование
+        </div>
         <div v-if="loaded">
-            <Line v-if="lineData" :data="lineData" :options="options"/>
             <div class="date-picker">
-                {{}}
-                <VueDatePicker v-model="startPeriod" @update:model-value="saveStartDate" auto-apply
+                <VueDatePicker v-model="startPeriod" @update:model-value="saveStartDate"
                                :max-date="endPeriod" :max-time="getMaxTime()"></VueDatePicker>
                 <p></p>
-                <VueDatePicker v-model="endPeriod" @update:model-value="saveEndDate" auto-apply></VueDatePicker>
+                <VueDatePicker v-model="endPeriod" @update:model-value="saveEndDate"></VueDatePicker>
             </div>
+            <Line :data="lineData" :options="options"/>
             <div class="up-down-percent">
-                <table class="equipment-table">
+                <table class="equipment-table" v-for="(dto, index) in equipmentStatistics.equipmentStatisticsDtos"
+                       :key="dto.equipmentData[0].equipmentId"
+                       :value="dto.equipmentData[0].equipmentId">
+                    <caption :class="'color' + (index + 1)">
+                        <router-link
+                            :to="{ name: 'EquipmentDetails', params: { id: dto.equipmentData[0].equipmentId }}">
+                            <span class="equipment">Оборудование №{{ dto.equipmentData[0].equipmentId }}</span>
+                        </router-link>
+                    </caption>
                     <tr class="total-up">
                         <td class="label">Вкл:</td>
-                        <td class="value">{{ parseInt(this.equipmentStatistics.upMinutes / 60) }} часов
-                            {{ this.equipmentStatistics.upMinutes % 60 }} минут
+                        <td class="value">{{ parseInt(dto.upMinutes / 60) }} часов
+                            {{ dto.upMinutes % 60 }} минут
                         </td>
                     </tr>
                     <tr class="total-down">
                         <td class="label">Выкл:</td>
-                        <td class="value">{{ parseInt(this.equipmentStatistics.downMinutes / 60) }} часов
-                            {{ this.equipmentStatistics.downMinutes % 60 }} минут
+                        <td class="value">{{ parseInt(dto.downMinutes / 60) }} часов
+                            {{ dto.downMinutes % 60 }} минут
                         </td>
                     </tr>
                     <tr class="up-not-schedule">
                         <td class="label">Вкл в нерабочее время:</td>
-                        <td class="value">{{ parseInt(this.equipmentStatistics.upNotScheduleMinutes / 60) }} часов
-                            {{ this.equipmentStatistics.upNotScheduleMinutes % 60 }} минут
+                        <td class="value">{{ parseInt(dto.upNotScheduleMinutes / 60) }} часов
+                            {{ dto.upNotScheduleMinutes % 60 }} минут
+                        </td>
+                    </tr>
+                    <tr class="down-not-schedule">
+                        <td class="label">Выкл в нерабочее время:</td>
+                        <td class="value">{{ parseInt(dto.downNotScheduleMinutes / 60) }} часов
+                            {{ dto.downNotScheduleMinutes % 60 }} минут
                         </td>
                     </tr>
                     <tr class="up-schedule">
                         <td class="label">Вкл в рабочее время:</td>
-                        <td class="value">{{ parseInt(this.equipmentStatistics.upScheduleMinutes / 60) }} часов
-                            {{ this.equipmentStatistics.upScheduleMinutes % 60 }} минут
-                            ({{ this.equipmentStatistics.upSchedulePercent.toFixed(2) }}%)
+                        <td class="value">{{ parseInt(dto.upScheduleMinutes / 60) }} часов
+                            {{ dto.upScheduleMinutes % 60 }} минут
+                            ({{ dto.upSchedulePercent.toFixed(2) }}%)
                         </td>
                     </tr>
                     <tr class="down-schedule">
                         <td class="label">Выкл в рабочее время:</td>
-                        <td class="value">{{ parseInt(this.equipmentStatistics.downScheduleMinutes / 60) }} часов
-                            {{ this.equipmentStatistics.downScheduleMinutes % 60 }} минут
-                            ({{ this.equipmentStatistics.downSchedulePercent.toFixed(2) }}%)
+                        <td class="value">{{ parseInt(dto.downScheduleMinutes / 60) }} часов
+                            {{ dto.downScheduleMinutes % 60 }} минут
+                            ({{ dto.downSchedulePercent.toFixed(2) }}%)
                         </td>
                     </tr>
                 </table>
                 <div v-if="typeof equipmentStatistics.upPercent == 'number'" class="percent">
-                    {{ this.equipmentStatistics.upPercent.toFixed(2) }}% вкл
+                    {{ dto.upPercent.toFixed(2) }}% вкл
                 </div>
             </div>
         </div>
@@ -85,8 +101,8 @@ export default {
     name: "EquipmentDataChart",
     components: {Line},
     props: {
-        equipmentId: {
-            type: String,
+        equipmentIds: {
+            type: Array,
             required: true
         }
     },
@@ -95,6 +111,7 @@ export default {
             loaded: false,
             startPeriod: null,
             endPeriod: null,
+            colors: ['rgba(194,45,45, 0.5)', 'rgba(19,101,19, 0.5)', 'rgba(0,0,255, 0.5)', 'rgba(0,0,0, 0.5)', 'rgba(255,186,0, 0.5)'],
         }
     },
     computed: {
@@ -102,23 +119,107 @@ export default {
             return this.getCurrentEquipmentStatistics()
         },
         lineData() {
+            if (!this.equipmentStatistics
+                || !this.equipmentStatistics.equipmentStatisticsDtos
+                || this.equipmentStatistics.equipmentStatisticsDtos.length === 0) {
+                return {
+                    labels: []
+                }
+            }
             return {
-                labels: this.equipmentStatistics.equipmentData.map(data => data.time),
-                datasets: [
-                    {
-                        data: this.equipmentStatistics.equipmentData.map(x => {
-                            x.x = x.time
-                            return x
-                        }),
-                        label: 'U',
-                        parsing: {
-                            yAxisKey: 'u'
-                        },
-                    }
-                ]
+                labels: this.equipmentStatistics.equipmentStatisticsDtos[0].equipmentData.map(data => data.time),
+                datasets: this.getDatasets()
             }
         },
         options() {
+            return this.getOptions();
+        },
+        chooseEquipment() {
+            return this.equipmentIds.length > 5 || this.equipmentIds.length === 0
+        },
+    },
+    async created() {
+        if (this.equipmentIds.length <= 5 && this.equipmentIds.length !== 0) {
+            this.startPeriod = this.$route.query.startPeriod ? new Date(this.$route.query.startPeriod) : null
+            this.endPeriod = this.$route.query.endPeriod ? new Date(this.$route.query.endPeriod) : null
+            await this.fetchStatistics()
+            if (this.loaded) {
+                if (this.equipmentStatistics) {
+                    this.startPeriod = new Date(this.equipmentStatistics.start)
+                    this.endPeriod = new Date(this.equipmentStatistics.end)
+                }
+            }
+        }
+    },
+    methods: {
+        ...mapGetters('equipmentStatistics', ['getCurrentEquipmentStatistics']),
+        ...mapActions('equipmentStatistics', ['fetchEquipmentStatistics']),
+        async saveStartDate(value) {
+            this.startPeriod = new Date(value);
+            await this.fetchStatistics()
+        },
+        async saveEndDate(value) {
+            this.endPeriod = new Date(value);
+            await this.fetchStatistics()
+        },
+        async fetchStatistics() {
+            if (!!this.startPeriod && !!this.endPeriod && this.startPeriod.getTime() >= this.endPeriod.getTime()) {
+                this.startPeriod.setMinutes(this.endPeriod.getMinutes() - 5)
+            }
+            this.loaded = false
+            await this.fetchEquipmentStatistics(
+                {
+                    ids: this.equipmentIds,
+                    start: this.startPeriod ? this.startPeriod.toISOString() : null,
+                    stop: this.endPeriod ? this.endPeriod.toISOString() : null
+                }
+            )
+            let query = this.$route.query;
+            this.$router.push({
+                name: 'EquipmentStatistics',
+                query: {
+                    ...query,
+                    startPeriod: this.startPeriod,
+                    endPeriod: this.endPeriod,
+                },
+            });
+            this.loaded = !!this.equipmentStatistics
+        },
+        getMaxTime() {
+            if (this.startPeriod && this.endPeriod) {
+                var sameDay = this.startPeriod.getFullYear() === this.endPeriod.getFullYear() &&
+                    this.startPeriod.getMonth() === this.endPeriod.getMonth() &&
+                    this.startPeriod.getDate() === this.endPeriod.getDate()
+                var sameHour = sameDay && this.startPeriod.getHours() === this.endPeriod.getHours()
+                console.log(sameHour)
+                return {
+                    hours: sameDay ? this.endPeriod.getHours() : 25,
+                    minutes: sameHour ? (this.endPeriod.getMinutes() - 1) : 61
+                }
+            }
+            return null
+        },
+        getDatasets() {
+            let result = []
+            console.log(this.equipmentStatistics.equipmentStatisticsDtos)
+            for (let i = 0; i < this.equipmentStatistics.equipmentStatisticsDtos.length; i++) {
+                let dto = this.equipmentStatistics.equipmentStatisticsDtos[i]
+                result.push({
+                    data: dto.equipmentData.map(x => {
+                        x.x = x.time
+                        return x
+                    }),
+                    borderColor: this.colors[i],
+                    label: 'U',
+                    parsing: {
+                        yAxisKey: 'u'
+                    },
+                })
+            }
+            console.log(result)
+            return result
+        },
+        getOptions() {
             return {
                 locale: 'RU',
                 animations: {
@@ -172,7 +273,6 @@ export default {
                     },
                 },
                 borderWidth: 1,
-                borderColor: 'rgba(0, 0, 0, 0.2)',
                 pointHoverBackgroundColor: function (context) {
                     var transitivity = 1;
                     const index = context.dataIndex;
@@ -263,66 +363,6 @@ export default {
                     },
                 }
             }
-        },
-    },
-    async created() {
-        this.startPeriod = this.$route.query.startPeriod ? new Date(this.$route.query.startPeriod) : null
-        this.endPeriod = this.$route.query.endPeriod ? new Date(this.$route.query.endPeriod) : null
-        await this.fetchStatistics()
-        if (this.loaded) {
-            if (this.equipmentStatistics && this.equipmentStatistics.equipmentData) {
-                this.startPeriod = new Date(this.equipmentStatistics.start)
-                this.endPeriod = new Date(this.equipmentStatistics.end)
-            }
-        }
-    },
-    methods: {
-        ...mapGetters('equipmentStatistics', ['getCurrentEquipmentStatistics']),
-        ...mapActions('equipmentStatistics', ['fetchEquipmentStatistics']),
-        async saveStartDate(value) {
-            this.startPeriod = new Date(value);
-            await this.fetchStatistics()
-        },
-        async saveEndDate(value) {
-            this.endPeriod = new Date(value);
-            await this.fetchStatistics()
-        },
-        async fetchStatistics() {
-            console.log(this.startPeriod)
-            if (!!this.startPeriod && !!this.endPeriod && this.startPeriod.getTime() >= this.endPeriod.getTime()) {
-                this.startPeriod.setMinutes(this.endPeriod.getMinutes() - 5)
-            }
-            this.loaded = false
-            await this.fetchEquipmentStatistics(
-                {
-                    id: this.equipmentId,
-                    start: this.startPeriod ? this.startPeriod.toISOString() : null,
-                    stop: this.endPeriod ? this.endPeriod.toISOString() : null
-                }
-            )
-            this.$router.push({
-                name: 'EquipmentDetails',
-                params: {id: this.equipmentId},
-                query: {
-                    startPeriod: this.startPeriod,
-                    endPeriod: this.endPeriod,
-                },
-            });
-            this.loaded = !!this.equipmentStatistics
-        },
-        getMaxTime() {
-            if (this.startPeriod && this.endPeriod) {
-                var sameDay = this.startPeriod.getFullYear() === this.endPeriod.getFullYear() &&
-                    this.startPeriod.getMonth() === this.endPeriod.getMonth() &&
-                    this.startPeriod.getDate() === this.endPeriod.getDate()
-                var sameHour = sameDay && this.startPeriod.getHours() === this.endPeriod.getHours()
-                console.log(sameHour)
-                return {
-                    hours: sameDay ? this.endPeriod.getHours() : 25,
-                    minutes:sameHour ? (this.endPeriod.getMinutes() - 1) :  61
-                }
-            }
-            return null
         }
     }
 }
@@ -333,22 +373,22 @@ export default {
     margin: 20px 70px 20px 70px;
 }
 .equipment-table {
-    width: 600px;
-    height: 20px;
+    width: 100%;
+    height: 15px;
     border-radius: 0;
     border-width: 1px;
     font-size: 15px;
     outline: none;
-    margin: 20px 20px 30px 20px;
+    margin: 10px 10px 10px 10px;
     border-collapse: collapse;
 }
 .equipment-table tr {
-    font-size: 16px;
-    border-bottom: 1px solid rgba(0, 85, 144, 0.69);
+    font-size: 13px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.69);
 }
 
 .equipment-table td {
-    padding: 5px;
+    /*padding: 5px;*/
     width: auto;
 }
 
@@ -358,8 +398,17 @@ export default {
     padding-right: 30px;
 }
 
+.equipment-table caption {
+    font-weight: bold;
+    text-align: center;
+}
+
 .up-not-schedule {
     color: rgb(255, 186, 0, 1);
+}
+
+.down-not-schedule {
+    color: rgb(0, 0, 0, 1);
 }
 
 .down-schedule {
@@ -369,4 +418,48 @@ export default {
 .up-schedule {
     color: rgb(3, 213, 3, 1);
 }
+
+.choose-unit {
+    font-size: 30px;
+}
+
+a, a:visited, a:active {
+    color: rgb(0, 0, 0);
+
+}
+
+a:hover {
+    color: rgb(0, 85, 144);
+    text-decoration: underline;
+
+}
+
+caption::before {
+    content: "";
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    margin-right: 5px; /* Adjust spacing between square and text */
+}
+
+.color1::before {
+    background-color: rgba(194, 45, 45, 0.5); /* Replace with your desired color */
+}
+
+.color2::before {
+    background-color: rgba(19, 101, 19, 0.5); /* Replace with your desired color */
+}
+
+.color3::before {
+    background-color: rgba(0, 0, 255, 0.5); /* Replace with your desired color */
+}
+
+.color4::before {
+    background-color: rgba(0, 0, 0, 0.5); /* Replace with your desired color */
+}
+
+.color5::before {
+    background-color: rgba(255, 186, 0, 0.5); /* Replace with your desired color */
+}
+
 </style>

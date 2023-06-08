@@ -9,9 +9,6 @@
             <button v-if="canDelete()" class="delete-button cron-button" @click="deleteCurrentEquipment()">Удалить
             </button>
         </div>
-        <div class="my-chart">
-            <EquipmentDataChart :key="componentKey" v-if="equipment" :equipmentId="$route.params.id"/>
-        </div>
         <div>
             <p class="cron-p">Частота сбора данных</p>
         </div>
@@ -293,20 +290,18 @@
 </template>
 
 <script>
-import EquipmentDataChart from '@/components/chart/EquipmentDataChart.vue'
 import EquipmentScheduleCreateModal from "@/components/equipment/EquipmentScheduleCreateModal.vue";
 import {mapActions, mapGetters} from 'vuex'
 import ScheduleCreateModal from "@/components/schedule/ScheduleCreateModal.vue";
 
 export default {
     name: "EquipmentDetails",
-    components: {ScheduleCreateModal, EquipmentScheduleCreateModal, EquipmentDataChart},
+    components: {ScheduleCreateModal, EquipmentScheduleCreateModal},
     data() {
         return {
             showModal: false,
             showScheduleModal: false,
             editingSchedule: {},
-            componentKey: 0,
         }
     },
     computed: {
@@ -381,7 +376,6 @@ export default {
             const response = await this.saveSchedule(scheduleData)
             if (response.ok) {
                 this.showOrCloseScheduleModal(false)
-                this.componentKey++;
             }
         },
         canUpdate() {

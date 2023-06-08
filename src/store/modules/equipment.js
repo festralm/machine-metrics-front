@@ -5,12 +5,16 @@ const equipment = {
     namespaced: true,
     state: {
         equipmentPage: {},
+        equipmentSearchPage: {},
         equipmentSearchList: {},
         currentEquipment: null,
     },
     mutations: {
         setEquipmentPage(state, equipmentPage) {
             state.equipmentPage = equipmentPage
+        },
+        setEquipmentSearchPage(state, equipmentSearchPage) {
+            state.equipmentSearchPage = equipmentSearchPage
         },
         setEquipmentSearchList(state, equipmentSearchList) {
             state.equipmentSearchList = equipmentSearchList
@@ -47,13 +51,25 @@ const equipment = {
         async searchEquipmentPage({commit}, data) {
             try {
                 const response = await fetchWithResponseCheck(
-                    `${API_URL}/equipment/search` +
+                    `${API_URL}/equipment/search-pageable` +
                     `?name=${data.name}` +
                     `&page=${data.page - 1}` +
                     `&size=${data.size}`
                 )
+                const equipmentSearchPage = await response.json()
+                commit('setEquipmentSearchPage', equipmentSearchPage)
+            } catch (error) {
+                console.log(error)
+            }
+        },
+        async searchEquipmentList({commit}, data) {
+            try {
+                const response = await fetchWithResponseCheck(
+                    `${API_URL}/equipment/search?unit=${data.unit}`
+                )
                 const equipmentSearchList = await response.json()
                 commit('setEquipmentSearchList', equipmentSearchList)
+                return equipmentSearchList;
             } catch (error) {
                 console.log(error)
             }
@@ -129,6 +145,7 @@ const equipment = {
     },
     getters: {
         getEquipmentPage: state => state.equipmentPage,
+        getEquipmentSearchPage: state => state.equipmentSearchPage,
         getEquipmentSearchList: state => state.equipmentSearchList,
         getCurrentEquipment: state => state.currentEquipment
     }
